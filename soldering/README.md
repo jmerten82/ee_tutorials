@@ -26,6 +26,12 @@ Seven bench sessions, about 18 hours in total, take you from never having held a
 
 Work in sessions of 60–90 minutes. Fine motor control degrades with fatigue faster than you notice, and a tired hand is where lifted pads come from.
 
+### Related courses
+
+- [ESP32 Hands-On](../esp32/README.md) and [Teensy 4.1 Hands-On](../teensy41/README.md) start where Lesson 2 ends. Both expect you to solder headers onto a module ([Exercise 6.4](#exercise-64-straight-headers-on-modules)) and to move a finished breadboard circuit onto perfboard.
+- [Oscilloscope Hands-On](../sds804x-hd/README.md) measures the [555 blinker](#exercise-23-build-a-555-led-blinker) from Lesson 2, and its current-sense lead uses the cable skills of [Exercise 6.1](#exercise-61-usb-cable-surgery-do-3).
+- The [oscilloscope buying guide](../oscilloscope/README.md) explains what a scope adds at the soldering bench: finding intermittent joints and checking a first power-up.
+
 ## The engineering of a solder joint
 
 Soldering is a metallurgical bond, not glue: molten tin reacts with clean copper and forms an intermetallic layer (mostly Cu₆Sn₅) a few microns thick. That reaction only happens when **both** metal surfaces are above the solder's melting point and free of oxide. Almost every beginner failure traces back to violating one of those two conditions.
@@ -407,6 +413,8 @@ Dots mark joined wires. C1 charges through R1 and R2 and discharges through R2 i
 
 **If it does not blink:** LED reversed (most common); C1 reversed; pin 4 not tied to +9 V; a solder bridge between adjacent socket pins; a cold joint on the socket. Measure pin 8 to pin 1: you should read about 9 V.
 
+> **Tip:** With a scope, check your blinker against the 555 formula and watch its timing capacitor charge: [Exercise 3.7](../sds804x-hd/README.md#exercise-37-optional-the-555-blinker) of the oscilloscope course.
+
 ## Lesson 3: Desoldering and rework
 
 **Goal:** remove parts and fix bad joints without damaging the board. **Time:** 1.5 hours. **Pass:** remove 10 resistors and the header strip from your Lesson 2 drill board with no lifted pads and every hole clear.
@@ -576,6 +584,8 @@ REASON cuts USB leads short and solders them straight to the CH334F hubs' pads. 
 ![Keep the data pair twisted right up to the pads](diagrams/07-usb-lead.svg)
 
 The braid and the drain are the cable's shield; folding them back cleanly and landing the drain on GND keeps the pair's noise immunity.
+
+> **Tip:** The same skills build the USB current-sense lead in [Exercise 6.1](../sds804x-hd/README.md#exercise-61-build-a-usb-current-sense-lead) of the oscilloscope course: a 1 Ω resistor spliced into the 5 V wire, for measuring a board's current on a scope.
 
 ### Exercise 6.2: Wires onto small pads, and an inline resistor
 

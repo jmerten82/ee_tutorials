@@ -37,6 +37,13 @@ Eight sessions, about 20 hours in total, take you from an unsoldered board to a 
 
 Work in sessions of 60–90 minutes and stop with something working. When a sketch misbehaves, the Troubleshooting chapter near the end is ordered by symptom.
 
+### Related courses
+
+- [Hands-On Soldering](../soldering/README.md): Lessons 0 to 2 before this course, and [Exercise 6.4](../soldering/README.md#exercise-64-straight-headers-on-modules) as a rehearsal for the headers in Exercise 0.1.
+- [ESP32 Hands-On](../esp32/README.md) covers the same basics with Wi-Fi, deep sleep and battery life instead of USB devices and audio. Do the two courses in either order.
+- [Oscilloscope Hands-On](../sds804x-hd/README.md) uses the Teensy for its fastest signals: pin edges in [Lesson 5](../sds804x-hd/README.md#lesson-5-edges-and-probing), MQS audio in [Exercise 4.6](../sds804x-hd/README.md#exercise-46-optional-teensy-mqs-audio) and the CAN bus in [Exercise 8.4](../sds804x-hd/README.md#exercise-84-can). Look for **With a scope** tips in the lessons below.
+- The [oscilloscope buying guide](../oscilloscope/README.md) lists what a scope shows in each exercise of this course.
+
 ## Three rules that save boards
 
 A Teensy 4.1 is robust against software mistakes: whatever you upload, the Program button always gets you back. It is fragile against electrical mistakes, and nearly every dead Teensy dies one of these three ways.
@@ -145,7 +152,7 @@ Your Teensy may have come without headers. Solder two 24-pin strips to the outer
 
 **Test:** no beep between 3.3V and GND, none between VIN and GND, and the board lifts out of the breadboard straight.
 
-> **Tip:** If you are new to soldering, Exercise 6.4 of the [soldering course](../soldering/README.md) is exactly this job on a cheaper module.
+> **Tip:** If you are new to soldering, [Exercise 6.4 of the soldering course](../soldering/README.md#exercise-64-straight-headers-on-modules) is exactly this job on a cheaper module.
 
 ### Exercise 0.2: Install Arduino IDE 2 and Teensyduino
 
@@ -219,6 +226,8 @@ On the Teensy, `Serial` is native USB, so it always runs at full USB speed and t
 
 **Test:** both rails within range. If 3.3V reads low, unplug and look for a short before going on.
 
+> **Tip:** With a scope, look at the rails over time: [Exercise 4.1](../sds804x-hd/README.md#exercise-41-ripple-on-the-3v3-rail) of the oscilloscope course measures ripple and noise.
+
 ## Lesson 1: Digital I/O and timing
 
 **Goal:** drive LEDs, read buttons reliably, and do several things at once without `delay()`. **Time:** 2.5 hours. **Pass:** the debounced counter in Exercise 1.3 counts exactly 50 for 50 presses, while an LED keeps blinking undisturbed.
@@ -274,6 +283,8 @@ void loop() {
 ![One press, four presses: why buttons need debouncing](diagrams/07-bounce-timing.svg)
 
 The raw contact flickers for a few milliseconds on press and on release. The Bounce library waits until the pin has been steady for the whole interval before it reports a single, clean change.
+
+> **Tip:** With a scope, see the bounce itself: [Exercise 3.1](../sds804x-hd/README.md#exercise-31-single-shot-see-the-bounce) of the oscilloscope course captures one press and measures how long it bounces.
 
 ### Exercise 1.3: Debounce with the Bounce2 library
 
@@ -392,6 +403,8 @@ void loop() {
 
 **Test:** steady blink during `delay()`, and you can explain why the edge count is higher than the press count.
 
+> **Tip:** With a scope, measure interrupt latency and timer jitter: [Exercise 3.4](../sds804x-hd/README.md#exercise-34-interrupt-latency) of the oscilloscope course shows the method on the ESP32; it works the same way here with `digitalWriteFast()`.
+
 ### Exercise 1.6: How fast is a pin?
 
 The processor counts its own clock cycles in `ARM_DWT_CYCCNT`. That lets you time code without an oscilloscope.
@@ -430,6 +443,8 @@ void loop() {
 3. Change the CPU Speed menu to 150 MHz and run it again.
 
 **Test:** `digitalWriteFast()` is several times faster, and both scale with the CPU speed. Record the numbers in the log.
+
+> **Tip:** With a scope, look at the square wave itself: [Exercise 5.1](../sds804x-hd/README.md#exercise-51-how-fast-is-a-teensy-pin) of the oscilloscope course measures this pin's frequency and edges, and [Exercise 5.2](../sds804x-hd/README.md#exercise-52-the-long-ground-lead) shows what a long ground lead does to them.
 
 ## Lesson 2: Analog in, PWM out, and switching real loads
 
@@ -492,6 +507,8 @@ void loop() {
 2. Change the 0.1 to 0.02 and to 0.5. Smaller is quieter but slower to follow.
 
 **Test:** you can explain the trade-off you see: smoothing removes jitter and adds lag. You will use exactly this filter for the MIDI knobs in Lesson 3.
+
+> **Tip:** With a scope, see the noise before you average it away: [Exercise 4.3](../sds804x-hd/README.md#exercise-43-clean-up-a-noisy-trace) of the oscilloscope course compares averaging and ERES.
 
 ### Exercise 2.3: A battery voltmeter
 
@@ -585,6 +602,8 @@ void loop() {
 **Test:** smooth dimming from off to full with no flicker; the motor runs smoothly from slow to full without the Teensy resetting. If the Teensy resets when the motor starts, see "brownouts" in Troubleshooting.
 
 > **Warning:** Keep 12 V on its own side of the breadboard and away from the Teensy's pins. Only the grounds are joined. Do not adapt this circuit to mains voltage.
+
+> **Tip:** With a scope, watch the MOSFET switch: [Lesson 7](../sds804x-hd/README.md#lesson-7-switching-loads) of the oscilloscope course probes the gate, the drain and the load current, with and without the flyback diode.
 
 ## Lesson 3: USB device types, the Teensy superpower
 
@@ -937,6 +956,8 @@ void loop() {
 
 > **Warning:** Do not connect headphones straight to the pins or the filter. A pin can give only a few milliamps and full-scale output is loud. Use powered speakers or an amplifier, and start with the volume low.
 
+> **Tip:** With a scope, see how MQS makes sound: [Exercise 4.6](../sds804x-hd/README.md#exercise-46-optional-teensy-mqs-audio) of the oscilloscope course shows the fast switching and its spectrum.
+
 ### Exercise 5.2: A synth you play over USB MIDI
 
 Set **Tools ▸ USB Type ▸ Serial + MIDI**. The sketch registers functions that `usbMIDI.read()` calls whenever a message arrives.
@@ -1038,6 +1059,8 @@ void loop() {
 2. Upload and open the Serial Monitor. Then pull one jumper and see which message stops.
 
 **Test:** "ping" and "pong" alternate every second. Real serial devices (a GPS module, a DIN MIDI port, another microcontroller) connect the same way, at 3.3 V levels.
+
+> **Tip:** With a scope, decode the serial frames and measure the baud rate: [Exercise 8.1](../sds804x-hd/README.md#exercise-81-uart) of the oscilloscope course.
 
 ### Exercise 6.2: An I2C sensor and an OLED
 
@@ -1150,6 +1173,8 @@ void loop() {
 3. Upload and turn the knob.
 
 **Test:** a frame every half second, the counter increasing and the second byte following the knob. Pull CANL: the frames stop; plug it back: they resume without a reset.
+
+> **Tip:** With a scope, see CANH, CANL and their difference, and decode the frames: [Exercise 8.4](../sds804x-hd/README.md#exercise-84-can) of the oscilloscope course uses exactly this setup.
 
 ### Exercise 6.4: USB host: plug a keyboard into the Teensy
 
@@ -1449,6 +1474,8 @@ Work from the top of each list: the first causes are the common ones.
 - A motor, solenoid or LED strip shares ground wiring with the Teensy and its start-up current makes the ground "bounce". Run separate thick ground wires from the load and from the Teensy to the supply's minus terminal (star ground).
 - Missing flyback diode on a motor or relay: the voltage spike resets or damages the board. Add the 1N5819.
 - Too much on the 3.3V pins: more than about 250 mA pulls the rail down. Power big loads from their own supply.
+
+> **Tip:** With a scope, catch the dip that causes the reset: [Exercise 6.4](../sds804x-hd/README.md#exercise-64-catch-a-brownout) of the oscilloscope course triggers on the 3.3 V rail falling below a threshold.
 
 ### A pin stopped working
 

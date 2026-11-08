@@ -9,7 +9,7 @@
 // Needs Google Chrome for the PDF (or CHROME=/path/to/chrome). Optional: Swift (macOS) for the
 // page numbers in the contents list. No npm dependencies.
 // Run `node tools/render-diagrams.mjs <tutorial-folder>` first if you changed a drawing.
-import { readFileSync, writeFileSync, existsSync, rmSync, mkdtempSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, rmSync, mkdtempSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -30,7 +30,20 @@ const name = config.name || 'course';
 // fenced code blocks (```lang optional-label), and > blockquotes (callouts).
 const esc = s => s.replace(/&(?!#?\w+;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const escCode = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const slug = s => s.toLowerCase().replace(/<[^>]+>/g, '').replace(/[^\p{L}\p{N}\s-]/gu, '').trim().replace(/\s/g, '-');
+const slug = s => s.toLowerCase().replace(/<[^>]+>/g, '').replace(/[^\p{L}\p{N}\s_-]/gu, '').trim().replace(/\s/g, '-');
+
+// Links to another tutorial's README (../esp32/README.md#exercise-13-see-the-bounce) point at that
+// tutorial's web page in the HTML, so the anchors keep working off GitHub too.
+const siblingPages = {};
+for (const dir of readdirSync(dirname(root), { withFileTypes: true }).filter(d => d.isDirectory())) {
+  const cfg = join(dirname(root), dir.name, 'course.config.mjs');
+  if (existsSync(cfg)) siblingPages[dir.name] = ((await import(pathToFileURL(cfg).href)).default.name || 'course') + '.html';
+}
+const htmlHref = href => {
+  const m = href.match(/^\.\.\/([\w-]+)\/README\.md(#.*)?$/);
+  if (m && siblingPages[m[1]]) return `../${m[1]}/${siblingPages[m[1]]}${m[2] || ''}`;
+  return href.replace(/README\.md$/, '');
+};
 
 let target = 'pdf'; // inline() renders links differently for the web page and the PDF
 function inline(src) {
@@ -40,7 +53,7 @@ function inline(src) {
   s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, href) => {
     if (href.startsWith('#')) return `<a href="${href}">${t}</a>`;
     const external = /^https?:/.test(href);
-    if (target === 'html') return `<a href="${href.replace(/README\.md$/, '')}">${t}</a>`;
+    if (target === 'html') return `<a href="${htmlHref(href)}">${t}</a>`;
     const shown = href.replace(/^https?:\/\//, '').replace(/\/$/, '');
     return external && shown !== t.replace(/<[^>]+>|\u0000\d+\u0000/g, '') ? `<span class="ref">${t}</span> <span class="url">(${shown})</span>` : `<span class="ref">${t}</span>`;
   });
@@ -245,8 +258,10 @@ function tocPages() {
 
 render(document(null));
 const found = tocPages();
-if (found && found.pages.length === tocItems.length) {
-  render(document(found.pages)); // same layout, numbers filled in
+// The contents list comes first on the cover pages; links further down (for example in the first chapter, when the
+// contents list is short) come after it in the scan, so the first tocItems.length targets belong to the contents.
+if (found && found.pages.length >= tocItems.length) {
+  render(document(found.pages.slice(0, tocItems.length))); // same layout, numbers filled in
   console.log(`wrote ${outPdf} (${found.total} pages)`);
 } else {
   console.log(`wrote ${outPdf} (contents without page numbers: ${found ? `found ${found.pages.length} of ${tocItems.length} links` : 'Swift not available'})`);

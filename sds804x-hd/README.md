@@ -29,6 +29,13 @@ Every lesson has a goal, the parts you need, numbered exercises and a pass crite
 
 Work in sessions of 60 to 120 minutes. The scope needs about 20 minutes to warm up before its specifications apply, so switch it on when you sit down and set up the circuit while it warms.
 
+### Related courses
+
+- [ESP32 Hands-On](../esp32/README.md): the board, breadboard and circuits most lessons measure, and the board that runs the test-signal sketch. Do at least its Lessons 0 to 4 first.
+- [Teensy 4.1 Hands-On](../teensy41/README.md): the fast pin edges of Lesson 5, the MQS audio of Lesson 4 and the CAN bus of Lesson 8.
+- [Hands-On Soldering](../soldering/README.md): the 555 blinker of Exercise 3.7 and the cable work for the current-sense lead in Lesson 6.
+- The [oscilloscope buying guide](../oscilloscope/README.md): why this scope, the alternatives, and a course-by-course list of what a scope shows in the other tutorials.
+
 ## What an oscilloscope does
 
 A multimeter answers "how many volts?" with one number, averaged over a fraction of a second. An oscilloscope answers "how many volts, **when**?" It draws voltage on the vertical axis against time on the horizontal axis, from a few nanoseconds per division to many seconds. Everything a meter averages away becomes visible: the square wave behind a PWM "voltage", the bounce behind a button press, the 50 mV dip when Wi-Fi transmits, the 40 V spike when a motor switches off, and the bits of a serial bus.
@@ -137,11 +144,11 @@ This has three consequences:
 ### Circuits from the other courses
 
 - [ ] ESP32-DevKitC V4 on its breadboard, from the [ESP32 course](../esp32/README.md) (1 to 9)
-- [ ] A push button on GPIO33 to GND, as in ESP32 Exercise 1.2 (3)
-- [ ] The MOSFET driver with its 12 V adapter, motor or LED strip and 1N5819, from ESP32 Exercise 3.2 (7)
-- [ ] The BME280 sensor and OLED on I2C, from ESP32 Lesson 4 (8)
+- [ ] A push button on GPIO33 to GND, as in [ESP32 Exercise 1.2](../esp32/README.md#exercise-12-read-a-button) (3)
+- [ ] The MOSFET driver with its 12 V adapter, motor or LED strip and 1N5819, from [ESP32 Exercise 3.2](../esp32/README.md#exercise-32-speed-control-with-pwm) (7)
+- [ ] The BME280 sensor and OLED on I2C, from [ESP32 Lesson 4](../esp32/README.md#lesson-4-sensors-and-a-display-on-i2c) (8)
 - [ ] Teensy 4.1 on its breadboard, from the [Teensy 4.1 course](../teensy41/README.md) (5, 8)
-- [ ] The two SN65HVD230 CAN transceivers from Teensy Exercise 6.3 (8)
+- [ ] The two SN65HVD230 CAN transceivers from [Teensy Exercise 6.3](../teensy41/README.md#exercise-63-can-bus-with-flexcan_t4) (8)
 - [ ] The 555 blinker from the [soldering course](../soldering/README.md), Exercise 2.3 (optional, 3)
 
 ### Parts
@@ -468,7 +475,7 @@ Deep memory is the reason to prefer a long capture over a short one: you capture
 
 The ESP32 course counted bounces in software. Here you see them.
 
-1. Wire the button from GPIO33 to GND, as in ESP32 Exercise 1.2, and upload any sketch that sets `pinMode(33, INPUT_PULLUP)` (the bounce counter from ESP32 Exercise 1.3 is fine). Probe CH1 on GPIO33.
+1. Wire the button from GPIO33 to GND, as in [ESP32 Exercise 1.2](../esp32/README.md#exercise-12-read-a-button), and upload any sketch that sets `pinMode(33, INPUT_PULLUP)` (the bounce counter from [ESP32 Exercise 1.3](../esp32/README.md#exercise-13-see-the-bounce) is fine). Probe CH1 on GPIO33.
 2. Set CH1 to 1 V/div, the timebase to 200 µs/div, and the trigger to Edge, C1, Falling, level about 1.6 V.
 3. Move the trigger point to the left part of the screen (horizontal **position**, or the shortcut in the timebase dialog), so you see mostly what happens after the trigger.
 4. Press **Single**. The scope waits. Press the button: one picture, then the scope stops.
@@ -641,7 +648,7 @@ On the SDS804X HD, FFT is a math operator. Its settings are the number of points
 
 ### Exercise 4.6 (optional): Teensy MQS audio
 
-1. Run the first sound sketch from Teensy Exercise 5.1. Probe the MQS output pin you used in that exercise.
+1. Run the first sound sketch from [Teensy Exercise 5.1](../teensy41/README.md#exercise-51-first-sound). Probe the MQS output pin you used in that exercise.
 2. In the time domain you see a fast switching signal, not a sine: MQS makes audio by switching a pin at high speed, like a PWM.
 3. FFT: the audio tone appears at the low end, and a large carrier far above the audio band. A 1 kΩ and 100 nF filter (1.6 kHz) is not hi-fi, but shows the tone appear in the time domain.
 
@@ -659,7 +666,7 @@ With the SDS804X HD's 5 ns, a 1 ns edge reads about 5.1 ns, a 5 ns edge reads 7 
 
 ### Exercise 5.1: How fast is a Teensy pin?
 
-1. Upload `toggle_speed.ino` from Teensy Exercise 1.6. Pin 11 now toggles as fast as the loop allows.
+1. Upload `toggle_speed.ino` from [Teensy Exercise 1.6](../teensy41/README.md#exercise-16-how-fast-is-a-pin). Pin 11 now toggles as fast as the loop allows.
 2. Switch off all channels except CH1 (2 GSa/s). Probe pin 11 with the **ground spring** on the probe tip and the spring touching the nearest GND pin: no long ground lead.
 3. Set 1 V/div, 10 ns/div, trigger on the rising edge at 1.65 V.
 4. Measure Frequency and Rise time. Compare the frequency with the `digitalWriteFast()` result from the Teensy course.
@@ -713,7 +720,7 @@ Two errors limit the high-side method. First, the two channels must have equal g
 
 ### Exercise 6.1: Build a USB current-sense lead
 
-1. Take a USB-A plug breakout and a USB-A socket breakout, or cut a USB extension cable as in soldering Exercise 6.1.
+1. Take a USB-A plug breakout and a USB-A socket breakout, or cut a USB extension cable as in [soldering Exercise 6.1](../soldering/README.md#exercise-61-usb-cable-surgery-do-3).
 2. Connect GND, D+ and D− straight through. Connect VBUS through a 1 Ω, 1 % shunt.
 3. Solder a short test wire to each end of the shunt (call them VBUS-in and VBUS-out) and one to GND.
 4. Check with the meter: GND, D+ and D− beep through; VBUS reads 1 Ω end to end.
@@ -747,7 +754,7 @@ void setup() {
 void loop() { }
 ```
 
-1. Add a `secrets.h` tab with your network, as in ESP32 Lesson 5, and upload. Then power the ESP32 through the current-sense lead.
+1. Add a `secrets.h` tab with your network, as in [ESP32 Lesson 5](../esp32/README.md#lesson-5-wi-fi-and-a-web-page), and upload. Then power the ESP32 through the current-sense lead.
 2. CH1 on VBUS-in, CH2 on VBUS-out, ground clips on the lead's GND wire. Both at 50 mV/div with an offset of −5 V (type it on the keypad). CH3 on the GPIO27 marker at 2 V/div.
 3. Press **Math**: F1 = C1 − C2. With 1 Ω, 1 mV on F1 is 1 mA. Set F1's scale so the trace fills the screen.
 4. Unplug the ESP32 from the lead's socket: F1 should read zero. Note what it reads; that is your offset error.
@@ -763,14 +770,14 @@ The battery-life arithmetic in the ESP32 course needs the average current. The s
 
 1. With the wake cycle of Exercise 6.2 captured and stopped, add a measurement on F1: Area@DC, gated to the awake time. Use the measurement gate, and put the gate cursors on the rising and falling edge of the marker on CH3.
 2. The area is in V·s. Divide by the shunt's resistance (1 Ω): that is the charge in ampere-seconds (coulombs). Convert to milliampere-hours: mAh = A·s ÷ 3.6.
-3. Compute the average current over a full 7 s cycle: (charge awake + sleep current × 5 s) ÷ 7 s. The DevKitC's sleep current is several milliamps because of its USB bridge and regulator; measure it on F1 at a slow timebase, or use the value from ESP32 Exercise 6.2.
+3. Compute the average current over a full 7 s cycle: (charge awake + sleep current × 5 s) ÷ 7 s. The DevKitC's sleep current is several milliamps because of its USB bridge and regulator; measure it on F1 at a slow timebase, or use the value from [ESP32 Exercise 6.2](../esp32/README.md#exercise-62-measure-the-current).
 4. Estimate the battery life of a 2000 mAh battery.
 
 **Test:** your charge per wake and your battery-life estimate, with the arithmetic, are in the log.
 
 ### Exercise 6.4: Catch a brownout
 
-1. Run the Wi-Fi sketch from ESP32 Exercise 5.1 (it stays connected), powered through a long, thin USB cable or a weak USB port.
+1. Run the Wi-Fi sketch from [ESP32 Exercise 5.1](../esp32/README.md#exercise-51-join-the-network) (it stays connected), powered through a long, thin USB cable or a weak USB port.
 2. CH1 on the board's 3V3 pin, DC coupling, 100 mV/div, offset −3.3 V. Trigger: Edge, C1, Falling, level 3.15 V, **Normal** mode, 200 µs/div.
 3. Every capture is a dip below 3.15 V. Measure the deepest one. If the board resets, it went below about 2.4 to 2.7 V, the brownout detector's range.
 4. Add a 470 µF electrolytic from 5V to GND on the breadboard (minus to GND), and repeat. The dips get shallower.
@@ -791,7 +798,7 @@ Roll mode works from 50 ms/div and slower. Use it for slow events you cannot tri
 
 ![Where to probe the MOSFET driver](diagrams/16-mosfet-probes.svg)
 
-Build the MOSFET driver from ESP32 Exercise 3.1 with the motor (or a 12 V relay coil), and add a 0.1 Ω shunt between the MOSFET's source and GND. Ground clips go to the GND of the circuit, which is also the 12 V adapter's minus.
+Build the MOSFET driver from [ESP32 Exercise 3.1](../esp32/README.md#exercise-31-switch-a-12-v-load-on-and-off) with the motor (or a 12 V relay coil), and add a 0.1 Ω shunt between the MOSFET's source and GND. Ground clips go to the GND of the circuit, which is also the 12 V adapter's minus.
 
 > **Warning:** Use the 12 V adapter from the ESP32 course, never a higher voltage, and only a small motor (under 0.5 A). Without the flyback diode, the spike can exceed the MOSFET's 30 V rating; the IRLB8721 survives a few such events by avalanche, not thousands. Do the diode-less test with single switching events only, and put the diode back straight away.
 
@@ -812,7 +819,7 @@ Build the MOSFET driver from ESP32 Exercise 3.1 with the motor (or a 12 V relay 
 
 ### Exercise 7.3: PWM and the gate resistor
 
-1. Load the knob speed-control sketch from ESP32 Exercise 3.2 (20 kHz PWM). Set the knob to about half.
+1. Load the knob speed-control sketch from [ESP32 Exercise 3.2](../esp32/README.md#exercise-32-speed-control-with-pwm) (20 kHz PWM). Set the knob to about half.
 2. CH1 on the gate, 1 V/div, 100 ns/div, trigger on the rising edge. Measure the gate's rise time with the 100 Ω gate resistor.
 3. Replace the 100 Ω with a wire link, and measure again. The edge is faster, and may ring.
 4. Replace it with 1 kΩ. The edge is much slower: the MOSFET spends longer half-on, and heats.
@@ -844,12 +851,12 @@ Wrong decoding is almost always a wrong setting (baud rate, threshold, which cha
 
 ### Exercise 8.2: I2C decode
 
-1. Build the BME280 circuit from ESP32 Exercise 4.3 and run its sketch.
+1. Build the BME280 circuit from [ESP32 Exercise 4.3](../esp32/README.md#exercise-43-read-the-bme280) and run its sketch.
 2. CH1 on SCL (GPIO22), CH2 on SDA (GPIO21), both 1 V/div.
 3. Decode: Bus 1, protocol I2C, SCL source C1, SDA source C2, 7-bit address, thresholds about 1.6 V.
 4. Trigger: Serial, I2C, condition Start. 200 µs/div, **Normal**.
 5. The decode shows the address (0x76 or 0x77 for the BME280), the read or write bit, the ACK, and the data bytes. Open the list view.
-6. Run the I2C scanner from ESP32 Exercise 4.2. Use the I2C trigger condition No Ack: the scope shows every address that nobody answered.
+6. Run the I2C scanner from [ESP32 Exercise 4.2](../esp32/README.md#exercise-42-scan-the-bus). Use the I2C trigger condition No Ack: the scope shows every address that nobody answered.
 
 ### Exercise 8.3: I2C rise time and pull-ups
 
@@ -870,7 +877,7 @@ I2C lines are pulled up by resistors and pulled down by the chips. The rise time
 
 ![CAN on the scope](diagrams/18-can.svg)
 
-1. Set up the Teensy CAN loopback from Teensy Exercise 6.3 (500 kbit/s, a frame every 500 ms).
+1. Set up the Teensy CAN loopback from [Teensy Exercise 6.3](../teensy41/README.md#exercise-63-can-bus-with-flexcan_t4) (500 kbit/s, a frame every 500 ms).
 2. CH1 on CANH, CH2 on CANL, both 1 V/div, ground clips on the transceivers' GND. CH3 on CAN1's CRX pin (the logic-level receive pin of the transceiver).
 3. Trigger on CH3, falling edge (start of frame), 20 µs/div, **Normal**.
 4. Recessive bits: CANH and CANL both about 2.3 V. Dominant bits: CANH higher, CANL lower, about 2 V apart.
@@ -885,7 +892,7 @@ I2C lines are pulled up by resistors and pulled down by the chips. The rise time
 
 **Goal:** apply everything to a finished project and write a measurement report. **Time:** 3 hours. **Pass:** a one-page report with screenshots that someone else could repeat.
 
-Choose the ESP32 room climate monitor (ESP32 Lesson 7) or the Teensy desk synth (Teensy Lesson 7). Measure it as a test engineer would, and record each result with its screenshot.
+Choose the ESP32 room climate monitor ([ESP32 Lesson 7](../esp32/README.md#lesson-7-capstone-a-room-climate-monitor)) or the Teensy desk synth ([Teensy Lesson 7](../teensy41/README.md#lesson-7-capstone-the-teensy-desk-synth)). Measure it as a test engineer would, and record each result with its screenshot.
 
 ### Exercise 9.1: Plan the measurements
 

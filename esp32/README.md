@@ -14,7 +14,7 @@ Eight sessions, about 17 hours in total, take you from plugging the board in for
 
 **Code.** Every sketch is complete: type it (or copy it) into a new Arduino sketch and upload it. Typing it is slower and teaches more. The sketches use only the Arduino-ESP32 core 3.x API; code from older tutorials that calls `ledcSetup()` or `ledcAttachPin()` is for core 2.x and will not compile.
 
-**Soldering.** Most DevKitC boards come with headers fitted. If yours does not, solder them first with the breadboard as a jig, as in Exercise 6.4 of the [soldering course](../soldering/README.md).
+**Soldering.** Most DevKitC boards come with headers fitted. If yours does not, solder them first with the breadboard as a jig, as in [Exercise 6.4 of the soldering course](../soldering/README.md#exercise-64-straight-headers-on-modules).
 
 | Lesson | Skill | Bench time | Pass criterion |
 | --- | --- | --- | --- |
@@ -28,6 +28,13 @@ Eight sessions, about 17 hours in total, take you from plugging the board in for
 | 7 | Capstone: room climate monitor | 4 h | Runs 24 hours unattended; the CSV download holds a full day of readings |
 
 Work in sessions of 60 to 120 minutes. Debugging a circuit while tired is how wires end up in the 5V row.
+
+### Related courses
+
+- [Hands-On Soldering](../soldering/README.md): solder headers if your board has none ([Exercise 6.4](../soldering/README.md#exercise-64-straight-headers-on-modules)), and the perfboard skills for a permanent capstone.
+- [Teensy 4.1 Hands-On](../teensy41/README.md) covers the same basics on a faster board, with no Wi-Fi but USB MIDI, audio, SD logging and CAN: [bounce](../teensy41/README.md#exercise-12-read-a-button-and-meet-bounce), [PWM](../teensy41/README.md#exercise-24-fade-an-led-with-pwm), a [12 V MOSFET switch](../teensy41/README.md#exercise-25-switch-12-v-with-a-mosfet) and [I2C](../teensy41/README.md#exercise-62-an-i2c-sensor-and-an-oled). Do the two courses in either order.
+- [Oscilloscope Hands-On](../sds804x-hd/README.md) is built on this course's circuits. The ESP32 becomes its test-signal generator, and the button, MOSFET driver, I2C sensor and Wi-Fi sketches return as measurement exercises. Look for **With a scope** tips in the lessons below.
+- The [oscilloscope buying guide](../oscilloscope/README.md) lists what a scope shows in each exercise of this course.
 
 ## The ESP32 in one page
 
@@ -256,6 +263,8 @@ void loop() {
 4. Red probe on GPIO25 while the LED is on: a little under 3.3 V. While it is off: 0 V.
 5. Write the readings in the practice log. When something misbehaves later, these are your "known good" numbers.
 
+> **Tip:** With a scope, look at the same rails over time: [Exercise 4.1](../sds804x-hd/README.md#exercise-41-ripple-on-the-3v3-rail) of the oscilloscope course shows the ripple and dips the meter averages away.
+
 ## Lesson 1: Digital inputs and outputs
 
 **Goal:** drive an LED safely, read a button reliably, and know when to use an interrupt. **Time:** 2 hours. **Pass:** with the debounced toggle sketch, 20 presses give exactly 20 toggles, and you can show the math for the LED resistor.
@@ -343,6 +352,8 @@ void loop() {
   lastLevel = level;
 }
 ```
+
+> **Tip:** With a scope, see the bounce itself: [Exercise 3.1](../sds804x-hd/README.md#exercise-31-single-shot-see-the-bounce) of the oscilloscope course captures one press with a single trigger and measures how long it bounces, which tells you how long to debounce.
 
 ### Exercise 1.4: Debounce in software
 
@@ -441,6 +452,8 @@ void loop() {
 
 > **Tip:** Reach for an interrupt only when you must not miss a short event or must react within microseconds. For buttons in normal sketches, the non-blocking debounce of Exercise 1.4 is simpler and just as good.
 
+> **Tip:** With a scope, measure how fast the interrupt reacts: [Exercise 3.4](../sds804x-hd/README.md#exercise-34-interrupt-latency) of the oscilloscope course times the delay from the button edge to the code.
+
 ## Lesson 2: PWM and analog
 
 **Goal:** make in-between values: dim an LED, position a servo, read a knob and measure a voltage above 3.3 V. **Time:** 2 hours. **Pass:** your sketch reads your 12 V adapter within 2 % of the multimeter, and you can explain why GPIO35 and not GPIO25 does the measuring.
@@ -484,6 +497,8 @@ void loop() {
 4. Measure the pin with the multimeter on DC volts at a few fixed duties (add `delay(5000)` after a `ledcWrite`). A meter averages too: at duty 128 it reads about 1.65 V.
 
 > **Note:** Once a pin is attached to LEDC, use `ledcWrite()` for it, not `digitalWrite()`. Call `ledcDetach(pin)` first if you want it back as a plain output.
+
+> **Tip:** With a scope, see the PWM the meter averages: [Exercise 2.1](../sds804x-hd/README.md#exercise-21-automatic-measurements) of the oscilloscope course measures its frequency and duty cycle, and [Exercise 4.2](../sds804x-hd/README.md#exercise-42-filter-a-pwm-into-a-dc-level) filters it into a DC level.
 
 ### Exercise 2.2: Position a servo
 
@@ -666,6 +681,8 @@ void loop() {
 3. Run at full speed for a minute and touch the MOSFET. Warm is fine; too hot to hold means it is not fully on: check the gate wiring and that it really is a logic-level part.
 4. Touch the 1N5819. It should be cool or barely warm.
 
+> **Tip:** With a scope, watch the MOSFET switch: [Lesson 7](../sds804x-hd/README.md#lesson-7-switching-loads) of the oscilloscope course probes the gate, the drain and the motor current, with and without the flyback diode.
+
 ### Relay modules: the caveats
 
 A relay is a switch moved by an electromagnet. It isolates the load completely and switches AC or DC, which is why relay modules are popular. On an ESP32 they come with traps:
@@ -735,6 +752,8 @@ void loop() {
 ```
 
 If nothing is found: SDA and SCL swapped (the most common mistake), the module powered from the wrong pin, or a loose jumper. If a module appears at an unexpected address, use that address.
+
+> **Tip:** With a scope, read the bus itself: [Exercise 8.2](../sds804x-hd/README.md#exercise-82-i2c-decode) of the oscilloscope course decodes the scan and triggers on every address nobody answers, and [Exercise 8.3](../sds804x-hd/README.md#exercise-83-i2c-rise-time-and-pull-ups) checks the pull-ups by their rise time.
 
 ### Exercise 4.3: Read the BME280
 
@@ -877,6 +896,8 @@ void loop() {
   delay(2000);
 }
 ```
+
+> **Tip:** With a scope, catch the supply dips that cause brownouts when Wi-Fi starts: [Exercise 6.4](../sds804x-hd/README.md#exercise-64-catch-a-brownout) of the oscilloscope course.
 
 ### How a page view works
 
@@ -1058,6 +1079,8 @@ void loop() {
 4. Optional, with a bench supply and a multimeter: unplug USB, feed 3.3 V into the 3V3 pin with the meter in series on the mA range, and measure again. Bypassing the LDO lowers the sleep current, but it stays far above the module's 10 µA because other parts on the 3.3 V rail still draw.
 
 > **Warning:** When you power the board through the 3V3 or 5V pin, USB must be unplugged. Two sources fight each other.
+
+> **Tip:** With a scope, see the whole wake cycle instead of an average: [Exercise 6.2](../sds804x-hd/README.md#exercise-62-wi-fi-bursts) and [Exercise 6.3](../sds804x-hd/README.md#exercise-63-charge-per-wake) of the oscilloscope course capture the Wi-Fi bursts and compute the charge per wake.
 
 ### Battery-life arithmetic
 

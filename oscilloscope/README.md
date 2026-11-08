@@ -6,7 +6,7 @@
 
 ## How to use this guide
 
-The three courses so far get by with a multimeter and a USB power meter. A meter shows one number, averaged over a fraction of a second. A scope shows the voltage over time, from nanoseconds to seconds, so you can see what the meter averages away: bounce, PWM, ripple, spikes, bus traffic and current bursts. The courses already hint at this. Teensy Exercise 1.6 times a pin "without an oscilloscope", and ESP32 Exercise 1.3 counts bounces in software because it cannot show them.
+The three courses so far get by with a multimeter and a USB power meter. A meter shows one number, averaged over a fraction of a second. A scope shows the voltage over time, from nanoseconds to seconds, so you can see what the meter averages away: bounce, PWM, ripple, spikes, bus traffic and current bursts. The courses already hint at this. [Teensy Exercise 1.6](../teensy41/README.md#exercise-16-how-fast-is-a-pin) times a pin "without an oscilloscope", and [ESP32 Exercise 1.3](../esp32/README.md#exercise-13-see-the-bounce) counts bounces in software because it cannot show them.
 
 This guide has four parts:
 
@@ -16,6 +16,11 @@ This guide has four parts:
 4. **A proposed fourth tutorial**, "Oscilloscope Hands-On", built from those uses.
 
 Most buying information comes from hobbyist review sites and forums, not manufacturer datasheets. Prices and bundled options change, so check the current spec sheet and listing before you buy. The sources are listed at the end.
+
+### Related courses
+
+- [Oscilloscope Hands-On](../sds804x-hd/README.md) is the full course that grew out of this guide, written for the Siglent SDS804X HD.
+- The measurement tables below point into [Hands-On Soldering](../soldering/README.md), [ESP32 Hands-On](../esp32/README.md) and [Teensy 4.1 Hands-On](../teensy41/README.md); those courses link back with **With a scope** tips.
 
 ## Which scope to buy
 
@@ -51,7 +56,7 @@ Choose between the two by preference. Reviews pick the DHO800 series as the best
 - **Memory depth:** megapoints, not kilopoints. Deep memory keeps the sample rate high on long timebases, for example a whole ESP32 wake cycle of 2 s at full detail.
 - **Triggers:** edge, pulse width, runt and serial-bus triggers, plus single-shot and Normal modes.
 - **Math:** CH1 minus CH2 (for CAN and for measuring across a shunt) and integration (charge per wake cycle).
-- **Decoders:** UART, I2C and SPI as a minimum; CAN for Teensy Lesson 6.
+- **Decoders:** UART, I2C and SPI as a minimum; CAN for [Teensy Lesson 6](../teensy41/README.md#lesson-6-talking-to-other-things).
 - **Earth lead and power:** USB-C powered scopes ship with a separate safety earth lead; read the manual on when to use it.
 
 ### Accessories
@@ -89,19 +94,19 @@ Many uses below need you to see when code runs. Pick a free pin, set it HIGH at 
 
 | Exercise | What to probe | What you should see and learn |
 | --- | --- | --- |
-| 0.5 Measure the rails | 3V3 and 5V pins, AC-coupled, 10 to 50 mV/div | The ripple and short dips the meter averages away; with Wi-Fi running (Lesson 5) the dips become bigger |
+| [0.5](../esp32/README.md#exercise-05-measure-the-rails) Measure the rails | 3V3 and 5V pins, AC-coupled, 10 to 50 mV/div | The ripple and short dips the meter averages away; with Wi-Fi running (Lesson 5) the dips become bigger |
 | Boot modes and strapping pins | GPIO0, 2, 5, 12, 14 and 15 during reset | Which pins pulse or are driven at boot; why GPIO14 is noted as "pulses at boot" and why straps are on the careful list |
-| **1.3 See the bounce** | GPIO33, Single trigger on the falling edge, 200 µs/div | The real bounce train of a button and of a bare wire. Measure its length; it gives the debounce time for 1.4 instead of a guess |
-| 1.5 Interrupts | Button on CH1, a debug pin toggled in the ISR on CH2 | Interrupt latency (edge to toggle) and its jitter with persistence on; extra ISR calls caused by bounce |
-| 2.1 Fade an LED | The PWM pin, then the same signal after a 10 kΩ / 1 µF RC filter | The square wave behind the 1.65 V meter reading; frequency and duty cycle; the filter turning it into DC with ripple |
-| 2.2 Position a servo | The servo signal pin | A 50 Hz frame with a 1 to 2 ms pulse; check the endpoints against the servo's specification |
-| 2.3 and 2.4 ADC | The knob wiper and the divider midpoint, AC-coupled | Noise and Wi-Fi interference on the input; the effect of a 100 nF capacitor from the divider to GND |
-| **3.1 and 3.2 MOSFET** | Gate, drain and a 0.1 Ω shunt in the source leg | The drain spike when the motor turns off, with and without D1 (safe at 12 V); gate edges with R1 = 0 Ω and 100 Ω; motor current ripple at 20 kHz |
-| 4.2 Scan the bus | SDA and SCL, I2C decode on | Address, ACK and NACK for every address the scanner tries |
-| 4.3 and 4.4 I2C sensor and OLED | SDA rise time, 30 % to 70 % of VDD | Rise time with internal pull-ups only, with 4.7 kΩ and with 2.2 kΩ. Fast-mode (400 kHz) allows 300 ns. Bus capacitance follows from C ≈ tR / (0.847 × R) |
-| **5.1 Join the network** | 3V3 pin, Normal trigger on a dip below about 3.1 V | The rail sagging in Wi-Fi transmit bursts; compare a good and a bad USB cable and the 470 µF capacitor from Troubleshooting |
-| **6.2 Measure the current** | Voltage across a shunt in the supply ground return (1 Ω for sleep, 0.1 Ω for Wi-Fi) | The whole wake, Wi-Fi, sleep profile; transmit peaks of about 240 mA (sometimes over 400 mA); integrate with scope math to get charge per wake for a better battery-life estimate |
-| 7 Capstone | Debug pins around measure, display, serve and sleep | How long each phase of the cycle takes, and where the energy goes |
+| **[1.3](../esp32/README.md#exercise-13-see-the-bounce) See the bounce** | GPIO33, Single trigger on the falling edge, 200 µs/div | The real bounce train of a button and of a bare wire. Measure its length; it gives the debounce time for 1.4 instead of a guess |
+| [1.5](../esp32/README.md#exercise-15-interrupts) Interrupts | Button on CH1, a debug pin toggled in the ISR on CH2 | Interrupt latency (edge to toggle) and its jitter with persistence on; extra ISR calls caused by bounce |
+| [2.1](../esp32/README.md#exercise-21-fade-an-led) Fade an LED | The PWM pin, then the same signal after a 10 kΩ / 1 µF RC filter | The square wave behind the 1.65 V meter reading; frequency and duty cycle; the filter turning it into DC with ripple |
+| [2.2](../esp32/README.md#exercise-22-position-a-servo) Position a servo | The servo signal pin | A 50 Hz frame with a 1 to 2 ms pulse; check the endpoints against the servo's specification |
+| [2.3](../esp32/README.md#exercise-23-read-a-knob) and [2.4](../esp32/README.md#exercise-24-measure-12-v-with-a-divider) ADC | The knob wiper and the divider midpoint, AC-coupled | Noise and Wi-Fi interference on the input; the effect of a 100 nF capacitor from the divider to GND |
+| **[3.1](../esp32/README.md#exercise-31-switch-a-12-v-load-on-and-off) and [3.2](../esp32/README.md#exercise-32-speed-control-with-pwm) MOSFET** | Gate, drain and a 0.1 Ω shunt in the source leg | The drain spike when the motor turns off, with and without D1 (safe at 12 V); gate edges with R1 = 0 Ω and 100 Ω; motor current ripple at 20 kHz |
+| [4.2](../esp32/README.md#exercise-42-scan-the-bus) Scan the bus | SDA and SCL, I2C decode on | Address, ACK and NACK for every address the scanner tries |
+| [4.3](../esp32/README.md#exercise-43-read-the-bme280) and [4.4](../esp32/README.md#exercise-44-show-it-on-the-oled) I2C sensor and OLED | SDA rise time, 30 % to 70 % of VDD | Rise time with internal pull-ups only, with 4.7 kΩ and with 2.2 kΩ. Fast-mode (400 kHz) allows 300 ns. Bus capacitance follows from C ≈ tR / (0.847 × R) |
+| **[5.1](../esp32/README.md#exercise-51-join-the-network) Join the network** | 3V3 pin, Normal trigger on a dip below about 3.1 V | The rail sagging in Wi-Fi transmit bursts; compare a good and a bad USB cable and the 470 µF capacitor from Troubleshooting |
+| **[6.2](../esp32/README.md#exercise-62-measure-the-current) Measure the current** | Voltage across a shunt in the supply ground return (1 Ω for sleep, 0.1 Ω for Wi-Fi) | The whole wake, Wi-Fi, sleep profile; transmit peaks of about 240 mA (sometimes over 400 mA); integrate with scope math to get charge per wake for a better battery-life estimate |
+| [7](../esp32/README.md#lesson-7-capstone-a-room-climate-monitor) Capstone | Debug pins around measure, display, serve and sleep | How long each phase of the cycle takes, and where the energy goes |
 
 > **Note:** A single shunt cannot cover both deep sleep (microamps) and Wi-Fi bursts (hundreds of milliamps). A 1 Ω shunt drops 0.24 V at 240 mA and can brown out the board; a 0.1 Ω shunt shows only 0.5 µV at 5 µA. Measure sleep and active separately, or use the diode across the 1 Ω shunt. On a DevKitC, the USB bridge and regulator add milliamps in sleep; that is the board, not the module.
 
@@ -109,29 +114,29 @@ Many uses below need you to see when code runs. Pick a free pin, set it HIGH at 
 
 | Exercise | What to probe | What you should see and learn |
 | --- | --- | --- |
-| 0.5 Measure the power rails | 3.3 V and VIN, AC-coupled | Ripple and noise; compare USB power from the Mac and from a hub |
-| **1.6 How fast is a pin?** | Pin 11 with the ground spring, 5 to 20 ns/div | The real square wave behind the meter's half-of-3.3 V reading: frequency, rise time and ringing at 600 MHz and 150 MHz. Compare with the `ARM_DWT_CYCCNT` numbers |
-| 1.2 and 1.3 Bounce | The button pin, Single trigger | The bounce train; check that Bounce2's interval is longer than the bounce |
-| 1.4 and 1.5 elapsedMillis, IntervalTimer | A debug pin per task, infinite persistence | Timer jitter, and how much of the loop each task uses |
-| 2.2 Noise and averaging | The analog input, AC-coupled | The noise before and after averaging, and with a capacitor at the pin |
-| 2.4 and 2.5 PWM and MOSFET | The gate pin, the drain, a shunt | The 20 kHz from `analogWriteFrequency`; the flyback spike with and without the 1N5819; the supply dip when the motor starts (the Brownouts section in Troubleshooting) |
-| 3.2 USB MIDI controller | Debug pins around the scan loop | Scan time and latency from a button press to the MIDI send |
-| 4.3 The data logger | A debug pin around each SD `write()`, and the 3.3 V rail | Write latency spikes when the card erases a block, and their current bursts; why a buffer prevents dropped samples |
-| **5.1 and 5.2 MQS audio** | MQS pins 10 and 12, raw and after an RC filter | The high-frequency PWM carrier, then the audio waveform; use FFT to compare sine, square and saw harmonics and to see aliasing |
-| 6.1 Hardware serial ports | TX pin, UART decode | The frame bits; the measured baud rate; what a baud mismatch looks like in the decoder |
-| 6.2 I2C sensor and OLED | SDA and SCL | Decoding and rise time, as in the ESP32 table |
-| **6.3 CAN bus** | CANH on CH1, CANL on CH2, math CH1 minus CH2 | The dominant and recessive levels, the bit time at your bit rate, and edges with and without the 120 Ω terminators; decode if your scope includes CAN |
-| 7 Capstone desk synth | Audio output and debug pins | Audio buffer timing, control-loop timing and output waveform under load |
+| [0.5](../teensy41/README.md#exercise-05-measure-the-power-rails) Measure the power rails | 3.3 V and VIN, AC-coupled | Ripple and noise; compare USB power from the Mac and from a hub |
+| **[1.6](../teensy41/README.md#exercise-16-how-fast-is-a-pin) How fast is a pin?** | Pin 11 with the ground spring, 5 to 20 ns/div | The real square wave behind the meter's half-of-3.3 V reading: frequency, rise time and ringing at 600 MHz and 150 MHz. Compare with the `ARM_DWT_CYCCNT` numbers |
+| [1.2](../teensy41/README.md#exercise-12-read-a-button-and-meet-bounce) and [1.3](../teensy41/README.md#exercise-13-debounce-with-the-bounce2-library) Bounce | The button pin, Single trigger | The bounce train; check that Bounce2's interval is longer than the bounce |
+| [1.4](../teensy41/README.md#exercise-14-several-things-at-once-with-elapsedmillis) and [1.5](../teensy41/README.md#exercise-15-intervaltimer-and-interrupts) elapsedMillis, IntervalTimer | A debug pin per task, infinite persistence | Timer jitter, and how much of the loop each task uses |
+| [2.2](../teensy41/README.md#exercise-22-noise-and-averaging) Noise and averaging | The analog input, AC-coupled | The noise before and after averaging, and with a capacitor at the pin |
+| [2.4](../teensy41/README.md#exercise-24-fade-an-led-with-pwm) and [2.5](../teensy41/README.md#exercise-25-switch-12-v-with-a-mosfet) PWM and MOSFET | The gate pin, the drain, a shunt | The 20 kHz from `analogWriteFrequency`; the flyback spike with and without the 1N5819; the supply dip when the motor starts (the Brownouts section in Troubleshooting) |
+| [3.2](../teensy41/README.md#exercise-32-the-usb-midi-controller) USB MIDI controller | Debug pins around the scan loop | Scan time and latency from a button press to the MIDI send |
+| [4.3](../teensy41/README.md#exercise-43-the-data-logger) The data logger | A debug pin around each SD `write()`, and the 3.3 V rail | Write latency spikes when the card erases a block, and their current bursts; why a buffer prevents dropped samples |
+| **[5.1](../teensy41/README.md#exercise-51-first-sound) and [5.2](../teensy41/README.md#exercise-52-a-synth-you-play-over-usb-midi) MQS audio** | MQS pins 10 and 12, raw and after an RC filter | The high-frequency PWM carrier, then the audio waveform; use FFT to compare sine, square and saw harmonics and to see aliasing |
+| [6.1](../teensy41/README.md#exercise-61-hardware-serial-ports) Hardware serial ports | TX pin, UART decode | The frame bits; the measured baud rate; what a baud mismatch looks like in the decoder |
+| [6.2](../teensy41/README.md#exercise-62-an-i2c-sensor-and-an-oled) I2C sensor and OLED | SDA and SCL | Decoding and rise time, as in the ESP32 table |
+| **[6.3](../teensy41/README.md#exercise-63-can-bus-with-flexcan_t4) CAN bus** | CANH on CH1, CANL on CH2, math CH1 minus CH2 | The dominant and recessive levels, the bit time at your bit rate, and edges with and without the 120 Ω terminators; decode if your scope includes CAN |
+| [7](../teensy41/README.md#lesson-7-capstone-the-teensy-desk-synth) Capstone desk synth | Audio output and debug pins | Audio buffer timing, control-loop timing and output waveform under load |
 
 ## Uses in the soldering course
 
 | Exercise | What to probe | What you should see and learn |
 | --- | --- | --- |
-| **2.3 Build a 555 LED blinker** | Output pin 3, and the timing capacitor | Frequency and duty cycle against f = 1.44 / ((R1 + 2 × R2) × C); the capacitor ramping between 1/3 and 2/3 of the supply |
+| **[2.3](../soldering/README.md#exercise-23-build-a-555-led-blinker) Build a 555 LED blinker** | Output pin 3, and the timing capacitor | Frequency and duty cycle against f = 1.44 / ((R1 + 2 × R2) × C); the capacitor ramping between 1/3 and 2/3 of the supply |
 | Inspection and troubleshooting | A signal or rail through a suspect joint, Normal trigger | An intermittent joint: tap the board and catch the dropout on screen |
-| 5 Capstone kit build, first power-up | Rails and any oscillator on the kit | That the kit works electrically, not just that it does not smoke |
-| 6.5 The interlock board | The relay coil, the level shifter input and output | The coil spike with and without the flyback diode; the level shifter's edges and delay |
-| 6.1 USB cable surgery | 5 V and GND under load | Voltage drop and noise through your repaired cable compared with a factory cable |
+| [5](../soldering/README.md#lesson-5-capstone-kit-build) Capstone kit build, first power-up | Rails and any oscillator on the kit | That the kit works electrically, not just that it does not smoke |
+| [6.5](../soldering/README.md#exercise-65-the-interlock-board-rehearsal-for-w23-w24-w26-w31) The interlock board | The relay coil, the level shifter input and output | The coil spike with and without the flyback diode; the level shifter's edges and delay |
+| [6.1](../soldering/README.md#exercise-61-usb-cable-surgery-do-3) USB cable surgery | 5 V and GND under load | Voltage drop and noise through your repaired cable compared with a factory cable |
 
 ## Proposed fourth tutorial: Oscilloscope Hands-On
 
