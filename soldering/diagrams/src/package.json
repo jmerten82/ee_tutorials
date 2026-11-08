@@ -1,0 +1,7 @@
+{
+  "name": "soldering-diagrams",
+  "private": true,
+  "type": "module",
+  "description": "Renders the course's line drawings (JSX sources) to print-friendly SVG. No dependencies.",
+  "scripts": { "render": "node render.mjs" }
+}

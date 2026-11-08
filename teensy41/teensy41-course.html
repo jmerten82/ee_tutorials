@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teensy 4.1 Hands-On: A Practical Course</title><style>/* Web page for every course (tools/build-course.mjs). The PDF is the version meant for paper. */
+:root { --ink: #111; --muted: #444; --line: #bbb; --tint: #f2f2f2; --accent: #000; --bg: #fff; }
+* { box-sizing: border-box; }
+html { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 17px; color: var(--ink); background: var(--bg); }
+body { margin: 0; line-height: 1.55; }
+main { max-width: 50rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+h1 { font-size: 2.2rem; line-height: 1.15; margin: 0.5rem 0 0.3rem; padding-bottom: 0.4rem; border-bottom: 5px solid var(--accent); }
+h2 { font-size: 1.6rem; line-height: 1.2; margin: 3.2rem 0 1rem; padding-bottom: 0.25rem; border-bottom: 3px solid var(--accent); }
+h3 { font-size: 1.15rem; margin: 2rem 0 0.6rem; padding-left: 0.5rem; border-left: 5px solid var(--accent); }
+.sub { color: var(--muted); }
+p { margin: 0 0 0.9rem; }
+
+.toc-head { font-size: 1.2rem; margin-top: 1.5rem; }
+.toc { columns: 2 18rem; column-gap: 2rem; }
+.toc-row { display: block; padding: 0.15rem 0; text-decoration: none; break-inside: avoid; }
+.toc-row:hover .toc-text { text-decoration: underline; }
+.toc-dots, .toc-page { display: none; }
+.howto { margin: 1.5rem 0; border: 2px solid var(--accent); padding: 0.7rem 1rem; }
+
+p.goal { border: 2px solid var(--accent); padding: 0.7rem 1rem; }
+p.label { font-size: 1.05rem; margin: 1.4rem 0 0.4rem; }
+
+ol { counter-reset: step; list-style: none; padding-left: 0; }
+ol > li { counter-increment: step; position: relative; padding-left: 2.3rem; margin: 0 0 0.55rem; min-height: 1.6rem; }
+ol > li::before { content: counter(step); position: absolute; left: 0; top: 0.05rem; width: 1.55rem; height: 1.55rem; background: var(--accent); color: #fff; font-weight: 700; font-size: 0.85rem; line-height: 1.55rem; text-align: center; border-radius: 4px; }
+ul { padding-left: 1.4rem; }
+ul > li { margin-bottom: 0.3rem; }
+ul.tasks { list-style: none; padding-left: 0; }
+ul.tasks > li { position: relative; padding-left: 1.9rem; }
+.box { position: absolute; left: 0; top: 0.2rem; width: 1.15rem; height: 1.15rem; border: 2px solid var(--accent); border-radius: 2px; }
+
+.table-wrap { overflow-x: auto; margin: 0.5rem 0 1.2rem; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; line-height: 1.4; }
+th, td { border: 1px solid var(--line); padding: 0.4rem 0.55rem; vertical-align: top; text-align: left; }
+th { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+figure { margin: 1.4rem 0; }
+figure img, figure svg { display: block; width: 100%; height: auto; }
+figcaption { font-size: 0.88rem; color: var(--muted); margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid var(--line); }
+.cover-fig img { max-width: 40rem; }
+
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.86em; }
+p code, li code, td code { background: var(--tint); padding: 0.05rem 0.25rem; border-radius: 3px; }
+.code { border: 1px solid var(--line); border-left: 5px solid var(--accent); margin: 0.8rem 0 1.2rem; background: #fafafa; }
+.code-label { background: var(--accent); color: #fff; font: 700 0.75rem ui-monospace, Menlo, monospace; padding: 0.2rem 0.6rem; }
+.code pre { margin: 0; padding: 0.7rem 0.9rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.45; }
+
+.callout { border: 2px solid var(--accent); padding: 0.7rem 1rem 0.2rem 3rem; margin: 1rem 0 1.3rem; position: relative; }
+.callout::before { position: absolute; left: 0.8rem; top: 0.75rem; width: 1.4rem; height: 1.4rem; line-height: 1.25rem; text-align: center; font-weight: 700; border: 2px solid var(--accent); border-radius: 50%; }
+.callout.warn { border-width: 3px; }
+.callout.warn::before { content: "!"; background: var(--accent); color: #fff; }
+.callout.tip::before { content: "→"; }
+.callout.note::before { content: "i"; font-family: Georgia, serif; }
+
+.card { position: relative; border: 2px dashed var(--accent); padding: 1rem 1.2rem 0.4rem; margin: 1.6rem 0; }
+.card .cut { position: absolute; top: -0.7rem; left: 1rem; background: var(--bg); padding: 0 0.4rem; font-size: 0.75rem; }
+.card h3 { margin-top: 0.3rem; }
+.card.wall ul.tasks > li { font-size: 1.25rem; font-weight: 700; }
+
+/* Worksheets are drawn for paper; on screen they just need to fit */
+.worksheet svg { max-width: 100%; height: auto; }
+.fields { display: flex; gap: 1rem; margin: 0.5rem 0 1rem; flex-wrap: wrap; }
+.fields span { flex: 1; min-width: 8rem; border-bottom: 1px solid var(--accent); padding-top: 1.2rem; font-size: 0.8rem; }
+
+@media (max-width: 600px) { html { font-size: 16px; } h1 { font-size: 1.8rem; } }
+@media print { main { max-width: none; padding: 0; } h2 { break-before: page; } figure, .code, .callout, .card, tr { break-inside: avoid; } }
+
+.card.strips { padding: 8pt 4pt 2pt; overflow-x: auto; }
+.card.strips svg { display: block; }
+table.planner td { height: 8.6mm; }
+table.planner td:first-child { width: 14mm; font-weight: 700; }
+table.planner td:last-child { width: 16mm; }
+</style></head>
+<body class="html"><main>
+<section class="cover">
+  <h1>Teensy 4.1 Hands-On: A Practical Course</h1>
+  <p class="sub">From the first blink to a USB MIDI desk synth, on real parts. Last updated 2026-11-07.</p>
+  <figure class="cover-fig"><img src="diagrams/02-block-diagram.svg" alt=""></figure>
+  <p><strong>Shopping list:</strong> see <a href="#everything-you-need-for-all-lessons">Everything you need for all lessons</a>.</p><p><strong>Printable version:</strong> print <a href="teensy41-course.pdf"><code>teensy41-course.pdf</code></a>. It has the whole course, high-contrast drawings, cut-out reference cards and fill-in worksheets (actual-size pin-label strips for the breadboard, a pin planner and the practice log). You can also read <a href="teensy41-course.html"><code>teensy41-course.html</code></a> in a browser. The drawings live in <a href="diagrams/"><code>diagrams/</code></a> as SVG, with high-contrast print versions in <a href="diagrams/print/"><code>diagrams/print/</code></a>; their sources are in <a href="diagrams/src/"><code>diagrams/src/</code></a>. From the repository root, <code>node tools/render-diagrams.mjs teensy41</code> rebuilds the drawings and <code>node tools/build-course.mjs teensy41</code> rebuilds the HTML and the PDF (it needs Google Chrome).</p>
+  <h2 class="toc-head">Contents</h2>
+  <nav class="toc"><a class="toc-row" href="#how-to-use-this-course"><span class="toc-text">How to use this course</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#three-rules-that-save-boards"><span class="toc-text">Three rules that save boards</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#everything-you-need-for-all-lessons"><span class="toc-text">Everything you need for all lessons</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-0-meet-the-board"><span class="toc-text">Lesson 0: Meet the board</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-1-digital-io-and-timing"><span class="toc-text">Lesson 1: Digital I/O and timing</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-2-analog-in-pwm-out-and-switching-real-loads"><span class="toc-text">Lesson 2: Analog in, PWM out, and switching real loads</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-3-usb-device-types-the-teensy-superpower"><span class="toc-text">Lesson 3: USB device types, the Teensy superpower</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-4-storage-and-time"><span class="toc-text">Lesson 4: Storage and time</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-5-sound"><span class="toc-text">Lesson 5: Sound</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-6-talking-to-other-things"><span class="toc-text">Lesson 6: Talking to other things</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-7-capstone-the-teensy-desk-synth"><span class="toc-text">Lesson 7: Capstone, the Teensy desk synth</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#troubleshooting"><span class="toc-text">Troubleshooting</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#reference-cards-and-practice-log"><span class="toc-text">Reference cards and practice log</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#worksheet-pin-label-strips"><span class="toc-text">Worksheet 1: actual-size pin-label strips</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#worksheet-pin-planner"><span class="toc-text">Worksheet 2: pin planner</span><span class="toc-dots"></span><span class="toc-page"></span></a></nav>
+  
+</section>
+<section class="chapter" id="how-to-use-this-course"><h2>How to use this course</h2><p>Eight sessions, about 20 hours in total, take you from an unsoldered board to a finished instrument: a desk synth with eight keys, four knobs and a screen that plays its own sound and also shows up on your Mac as a USB MIDI controller. Every lesson has a goal, the parts you need, numbered exercises and a pass criterion. Do not move on until you pass.</p><p><strong>Who it is for.</strong> You can solder (if not, do Lessons 0–2 of the <a href="../soldering/">soldering course</a> first) but you have never programmed a microcontroller. Every sketch here is complete: type it in or copy it, upload it, then change one thing at a time and watch what happens. That last step is where the learning is.</p><p><strong>Defaults used throughout.</strong> If yours differ, the text tells you what changes.</p><div class="table-wrap"><table><thead><tr><th>Item</th><th>Default in this course</th></tr></thead><tbody><tr><td>Board</td><td>Teensy 4.1 (NXP i.MX RT1062, ARM Cortex-M7 at 600 MHz, 8 MB flash, 1 MB RAM, microSD socket, Ethernet PHY, USB host pads, RTC with VBAT, two PSRAM footprints)</td></tr><tr><td>Computer</td><td>A Mac with macOS; Windows and Linux work the same apart from the port names</td></tr><tr><td>Software</td><td>Arduino IDE 2.x with Teensyduino installed through the Boards Manager</td></tr><tr><td>Logic level</td><td>3.3 V everywhere. No pin is 5 V tolerant</td></tr><tr><td>Cable</td><td>USB-A or USB-C to micro-B, a <strong>data</strong> cable (many phone-charging cables have no data wires)</td></tr></tbody></table></div><p><strong>Printing.</strong> Everything is line art and text, so it prints cleanly in black and white. The pin-label strips at the end are actual size: print at 100 % and check the scale bar. The checkboxes and the practice log are meant to be filled in by pen.</p><div class="table-wrap"><table><thead><tr><th>Lesson</th><th>Skill</th><th>Bench time</th><th>Pass criterion</th></tr></thead><tbody><tr><td>0</td><td>Meet the board: power, 3.3 V rules, first upload, USB serial</td><td>2 h</td><td>Blink runs from your own edit; Serial prints the CPU temperature</td></tr><tr><td>1</td><td>Digital I/O and timing: LEDs, buttons, debouncing, timers, interrupts</td><td>2.5 h</td><td>One press = exactly one count, 50 presses in a row</td></tr><tr><td>2</td><td>Analog in, PWM out, switching 12 V with a MOSFET</td><td>3 h</td><td>Battery reading within 2 % of your meter; strip dims smoothly from a knob</td></tr><tr><td>3</td><td>USB device types: MIDI controller and macro keyboard</td><td>2.5 h</td><td>Four keys and four knobs drive a synth in a DAW, no stuck notes, no jitter</td></tr><tr><td>4</td><td>Storage and time: SD data logger with RTC timestamps</td><td>2 h</td><td>One hour of 1-second CSV lines, opened in a spreadsheet, no gaps</td></tr><tr><td>5</td><td>Sound: Audio library, MQS output, a MIDI-played synth</td><td>2 h</td><td>The synth plays clean notes from the Mac with no clicks or crackle</td></tr><tr><td>6</td><td>Talking to other things: serial, I2C, CAN, USB host, Ethernet</td><td>3 h</td><td>Each short exercise passes its own test</td></tr><tr><td>7</td><td>Capstone: the Teensy desk synth</td><td>3–4 h</td><td>Every line of the capstone test checklist ticked</td></tr></tbody></table></div><p>Work in sessions of 60–90 minutes and stop with something working. When a sketch misbehaves, the Troubleshooting chapter near the end is ordered by symptom.</p></section>
+<section class="chapter" id="three-rules-that-save-boards"><h2>Three rules that save boards</h2><p>A Teensy 4.1 is robust against software mistakes: whatever you upload, the Program button always gets you back. It is fragile against electrical mistakes, and nearly every dead Teensy dies one of these three ways.</p><ol><li><strong>Nothing above 3.3 V on any pin.</strong> Not 5 V from an Arduino sensor, not 5 V from a USB rail, not 12 V through a careless jumper. Analog pins included.</li><li><strong>No more than 4 mA from any pin, and no more than 250 mA from the 3.3V pins in total.</strong> A pin lights an LED through a resistor or drives a transistor's gate. It never powers a motor, a relay coil or a strip of LEDs.</li><li><strong>Never short VIN or 3.3V to GND, and never feed VIN while USB is plugged in</strong> unless you have cut the VIN–VUSB link (Lesson 0). Check with the meter before the first power-up of every new circuit.</li></ol><figure><img src="diagrams/04-five-volt-danger.svg" alt="No pin is 5 V tolerant: what goes wrong, and three fixes"><figcaption>Above 3.3 V, the pin's protection diode conducts into the 3.3 V rail; the pin, or the whole chip, dies, often without any smell. Use a divider for slow 5 V inputs (A), a 74AHCT125 powered at 5 V for outputs that must reach 5 V logic (B), and a BSS138 level-converter board for I2C (C).</figcaption></figure><p><strong>Bench rules.</strong> Unplug USB before you change wiring. Wire GND first. Power up new circuits with the meter's continuity beeper already checked between 3.3V and GND (no beep) and between VIN and GND (no beep). Keep 12 V supplies switched off until the logic side works. Nothing in this course touches mains voltage.</p></section>
+<section class="chapter" id="everything-you-need-for-all-lessons"><h2>Everything you need for all lessons</h2><p>Print this page and tick items off as they arrive. Quantities cover every exercise once with a little spare; the numbers in brackets are the lessons that first use each item. Model names are examples, not endorsements; check that every breakout you buy runs at 3.3 V.</p><h3 id="tools-buy-once">Tools (buy once)</h3><ul class="tasks"><li class="task"><span class="box"></span>Soldering iron, solder and flux from the <a href="../soldering/">soldering course</a> kit (0)</li><li class="task"><span class="box"></span>Multimeter with continuity beeper, DC volts and, if possible, a frequency range (0)</li><li class="task"><span class="box"></span>Two full-size solderless breadboards (830 holes) (0, 7)</li><li class="task"><span class="box"></span>Jumper wire kit: male-male, plus some male-female (1)</li><li class="task"><span class="box"></span>Flush cutters and wire strippers (1)</li><li class="task"><span class="box"></span>A Mac with Arduino IDE 2.x and a free USB port; a powered USB hub is handy (0)</li></ul><h3 id="boards-and-modules">Boards and modules</h3><ul class="tasks"><li class="task"><span class="box"></span>Teensy 4.1 (the version with Ethernet if you want Exercise 6.5), plus two 24-pin 0.1" male header strips (0)</li><li class="task"><span class="box"></span>USB-A or USB-C to micro-B <strong>data</strong> cable, 1 m (0)</li><li class="task"><span class="box"></span>microSD card, 4–32 GB, any brand-name card (4)</li><li class="task"><span class="box"></span>CR2032 coin cell and a holder with flying leads (4)</li><li class="task"><span class="box"></span>SSD1306 OLED, 128 × 64, I2C, 3.3 V-capable (6, 7)</li><li class="task"><span class="box"></span>BME280 breakout, 3.3 V (Adafruit, SparkFun or a generic purple board) (6)</li><li class="task"><span class="box"></span>Two SN65HVD230 CAN transceiver breakouts (Waveshare SN65HVD230 CAN Board or similar) (6)</li><li class="task"><span class="box"></span>USB Host Cable for Teensy 4.1 (PJRC) and a 5-pin 0.1" header; a USB MIDI keyboard or a USB computer keyboard to test with (6)</li><li class="task"><span class="box"></span>Optional: Ethernet Kit for Teensy 4.1 (PJRC MagJack kit) and a network cable (6)</li><li class="task"><span class="box"></span>Optional: Audio Adaptor Board for Teensy 4.x, Rev D (SGTL5000) (5)</li></ul><h3 id="components">Components</h3><ul class="tasks"><li class="task"><span class="box"></span>5 mm LEDs, red and green, 10 of each (1)</li><li class="task"><span class="box"></span>Resistors, 1/4 W: 470 Ω × 10, 100 Ω × 5, 2.2 kΩ × 5, 4.7 kΩ × 5, 10 kΩ × 10, 15 kΩ × 5, 47 kΩ × 5 (1, 2, 5)</li><li class="task"><span class="box"></span>6 × 6 mm tactile pushbuttons × 12 (1, 3, 7)</li><li class="task"><span class="box"></span>10 kΩ linear potentiometers (B10K) × 4, with knobs (2, 3, 7)</li><li class="task"><span class="box"></span>Capacitors: 100 nF ceramic × 10, 4.7 nF film or C0G × 4, 10 µF electrolytic × 4 (2, 5)</li><li class="task"><span class="box"></span>IRLB8721 N-MOSFET (TO-220) × 2 and 1N5819 Schottky diodes × 4 (2)</li><li class="task"><span class="box"></span>3.5 mm stereo jack breakout, or a cut audio cable (5)</li><li class="task"><span class="box"></span>A few 0.1" female and male header strips, and two perfboards about 7 × 9 cm (6, 7)</li><li class="task"><span class="box"></span>Optional for reference: 74AHCT125 and a 4-channel BSS138 level-converter board (0)</li></ul><h3 id="12-v-and-audio-lesson-2-and-5">12 V and audio (Lesson 2 and 5)</h3><ul class="tasks"><li class="task"><span class="box"></span>12 V DC power supply, 2 A or more, with a screw-terminal DC jack adapter (2)</li><li class="task"><span class="box"></span>50 cm of 12 V LED strip (single colour, non-addressable) (2)</li><li class="task"><span class="box"></span>A small 12 V DC motor (computer fan motors work too) (2)</li><li class="task"><span class="box"></span>Powered computer speakers with a 3.5 mm line input, or a small amplifier module such as a PAM8302 with a 4–8 Ω speaker (5)</li></ul><h3 id="software-free">Software (free)</h3><ul class="tasks"><li class="task"><span class="box"></span>Arduino IDE 2.x from arduino.cc (0)</li><li class="task"><span class="box"></span>Teensyduino through the Boards Manager (0)</li><li class="task"><span class="box"></span>Libraries from the Library Manager: Adafruit SSD1306, Adafruit GFX Library, Adafruit BME280 Library (6, 7)</li><li class="task"><span class="box"></span>On the Mac: GarageBand (preinstalled) as a synth, MIDI Monitor by Snoize, MidiKeys to play notes into the Teensy; for the capstone, a DAW that can send MIDI out, such as Reaper or Ableton Live Lite (3, 5, 7)</li></ul></section>
+<section class="chapter" id="lesson-0-meet-the-board"><h2>Lesson 0: Meet the board</h2><p class="goal"><strong>Goal:</strong> know what is on the board, where power goes, how to upload, and how to talk to the Teensy over USB. <strong>Time:</strong> 2 hours. <strong>Pass:</strong> Blink runs at a rate you chose, the Serial Monitor prints the CPU temperature once a second, and you can point to VIN, 3.3V, GND, VBAT and the Program button without looking at the drawing.</p><h3 id="what-you-are-holding">What you are holding</h3><p>The Teensy 4.1 is a 61 × 18 mm board built around NXP's i.MX RT1062, an ARM Cortex-M7 running at 600 MHz: hundreds of times faster than a classic Arduino Uno, with a floating-point unit, 1 MB of RAM and 8 MB of flash for your program. Around it sit a microSD socket, an Ethernet PHY (it only needs a jack), pads for a second USB port that works as a host, a real-time clock and two footprints for extra PSRAM chips.</p><figure><img src="diagrams/02-block-diagram.svg" alt="Inside the Teensy 4.1: one fast processor and a lot of plumbing"><figcaption>Everything goes through the processor. The parts with dashed outlines need something you add: a PSRAM chip, the MagJack kit for Ethernet, a host cable for USB host, a coin cell for the clock.</figcaption></figure><figure><img src="diagrams/01-board-pinout.svg" alt="Teensy 4.1 pinout: top view, USB at the top"><figcaption>Each pin has a number (what you write in code) and several possible jobs. Solid boxes are power; outlined pills are analog inputs; the square-wave glyph means PWM. The inner pads (USB host, Ethernet, On/Off, Program, GND, 3.3V, VBAT) are drawn where they sit on the board; check the order of the five pads beside the SD socket against the silkscreen or PJRC's printed card before you solder to them. The same information is on Card A and, at actual size, on the pin-label strips at the end.</figcaption></figure><h3 id="power-in-one-picture">Power, in one picture</h3><figure><img src="diagrams/03-power.svg" alt="Where the power goes: 5 V in, 3.3 V out"><figcaption>USB brings 5 V to VUSB. A trace on the underside joins VUSB to VIN, and VIN feeds a regulator that makes 3.3 V for the processor and for the 3.3V pins. The coin cell on VBAT only runs the clock.</figcaption></figure><p>The facts you need, all from PJRC's Teensy 4.1 page:</p><ul><li><strong>VIN</strong> accepts 3.6–5.5 V. With USB plugged in, VIN <em>is</em> the USB 5 V.</li><li><strong>3.3V pins</strong> can supply about 250 mA to your circuits, on top of what the board itself draws (around 100 mA at 600 MHz).</li><li><strong>VIN–VUSB link.</strong> To run from an external 5 V supply while USB is also plugged in (for example to keep a project powered while you debug it), cut the thin trace between the two pads on the underside marked for it, using a sharp knife, then check with the meter that VIN and VUSB no longer beep. After that the board runs from VIN only, and USB still works for data. Never feed VIN with the link intact and USB plugged in: you would back-feed your Mac's USB port.</li><li><strong>VBAT</strong> takes a 3 V coin cell (CR2032). It keeps the real-time clock running while the power is off.</li><li><strong>On/Off</strong> pad: a button to GND. Held for 4 seconds it switches the 3.3 V off; pressed for half a second it switches it on again.</li><li><strong>Program</strong> button: it does not reset the board; it puts it into upload mode. Pressing it is always safe.</li></ul><h3 id="exercise-01-solder-the-headers">Exercise 0.1: Solder the headers</h3><p>Your Teensy may have come without headers. Solder two 24-pin strips to the outer rows; leave the inner pads bare for now.</p><ol><li>Push the two header strips into a breadboard, 0.6" apart (rows d and h on most boards; see the breadboard drawing in Lesson 1), long pins down.</li><li>Lay the Teensy on top, components up. The breadboard is the jig that keeps the pins square.</li><li>Solder one corner pin on each strip, check the board sits flat, then solder the rest. Keep each joint under 3 seconds; the processor sits close to the pins.</li><li>Inspect with a loupe: 48 smooth fillets, no bridges. Check adjacent pins with the meter's beeper, especially around GND and 3.3V.</li></ol><p><strong>Test:</strong> no beep between 3.3V and GND, none between VIN and GND, and the board lifts out of the breadboard straight.</p><aside class="callout tip"><p><strong>Tip:</strong> If you are new to soldering, Exercise 6.4 of the <a href="../soldering/">soldering course</a> is exactly this job on a cheaper module.</p></aside><h3 id="exercise-02-install-arduino-ide-2-and-teensyduino">Exercise 0.2: Install Arduino IDE 2 and Teensyduino</h3><ol><li>Download Arduino IDE 2.x from arduino.cc, drag it to Applications and open it once. macOS will ask for permission to access the Documents folder: allow it, because Arduino keeps boards and libraries there.</li><li>Open <strong>Arduino IDE ▸ Settings</strong>. In <strong>Additional boards manager URLs</strong>, paste <code>https://www.pjrc.com/teensy/package_teensy_index.json</code> and click OK.</li><li>Click the Boards Manager icon on the left, search for <code>teensy</code>, and install <strong>Teensy</strong> (by Paul Stoffregen). It is a large download.</li><li>Plug the Teensy in with your data cable. A new Teensy runs a blink program out of the box: the orange LED flashes.</li><li>Choose <strong>Tools ▸ Board ▸ Teensy ▸ Teensy 4.1</strong>, then <strong>Tools ▸ Port</strong>: pick the entry under "Teensy ports" (or a <code>/dev/cu.usbmodem…</code> port). Leave <strong>Tools ▸ USB Type</strong> at <strong>Serial</strong> and <strong>Tools ▸ CPU Speed</strong> at <strong>600 MHz</strong>.</li></ol><p><strong>Test:</strong> <strong>Tools ▸ Get Board Info</strong> (or the port list) shows a Teensy. No driver is needed on macOS.</p><aside class="callout note"><p><strong>Note:</strong> If no port appears, try another cable first. A charge-only cable powers the board (the LED blinks) but carries no data. That is the most common first-day problem.</p></aside><h3 id="exercise-03-first-upload">Exercise 0.3: First upload</h3><div class="code"><div class="code-label">blink.ino</div><pre><code>// Blink the orange LED on pin 13.
+const int ledPin = 13;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(ledPin, HIGH);
+  delay(500);
+  digitalWrite(ledPin, LOW);
+  delay(500);
+}</code></pre></div><ol><li>Paste the sketch into a new window and click <strong>Upload</strong> (the arrow).</li><li>The IDE compiles, then the small Teensy Loader window appears and programs the board. The first upload may ask you to press the Program button; press it once.</li><li>Change both delays to 100, upload again, and watch the rate change.</li></ol><p><strong>Test:</strong> the LED blinks at the rate you set. You have the whole loop working: edit, compile, upload, run.</p><p><code>setup()</code> runs once after power-up; <code>loop()</code> then runs forever. <code>pinMode()</code> makes a pin an output; <code>digitalWrite()</code> sets it to 3.3 V (<code>HIGH</code>) or 0 V (<code>LOW</code>); <code>delay()</code> waits a number of milliseconds and does nothing else meanwhile, which Lesson 1 fixes.</p><h3 id="exercise-04-talk-over-usb">Exercise 0.4: Talk over USB</h3><div class="code"><div class="code-label">hello_serial.ino</div><pre><code>// Print a greeting and the CPU temperature once a second.
+void setup() {
+  Serial.begin(9600);                      // the number is ignored on USB
+  while (!Serial &amp;&amp; millis() &lt; 4000) { }   // wait up to 4 s for the monitor
+  if (CrashReport) Serial.print(CrashReport);
+  Serial.println("Hello from Teensy 4.1");
+  Serial.printf("CPU clock: %lu MHz\n", F_CPU_ACTUAL / 1000000);
+}
+
+void loop() {
+  Serial.printf("%lu ms since start, CPU at %.1f C\n", millis(), tempmonGetTemp());
+  delay(1000);
+}</code></pre></div><ol><li>Upload, then open <strong>Tools ▸ Serial Monitor</strong>.</li><li>Read the lines. Touch the processor (the big square chip) and watch the temperature rise a degree or two.</li><li>Set <strong>Tools ▸ CPU Speed</strong> to 150 MHz, upload, and compare the temperature after a minute.</li></ol><p><strong>Test:</strong> one line per second, a sensible temperature (typically 35–55 °C at 600 MHz), and the clock line matching the CPU Speed menu.</p><p>On the Teensy, <code>Serial</code> is native USB, so it always runs at full USB speed and the baud rate is ignored. The <code>while (!Serial …)</code> line waits for the Serial Monitor so you do not miss the first lines. <code>CrashReport</code> prints the reason for the last crash, if there was one; keep that line in every sketch while you develop.</p><h3 id="exercise-05-measure-the-power-rails">Exercise 0.5: Measure the power rails</h3><ol><li>With the Teensy plugged in, set the meter to DC volts.</li><li>Measure VIN to GND (about 5 V from USB), 3.3V to GND (3.3 V within 2 %), and VBAT to GND (near 0 V without a coin cell).</li><li>Note the numbers in the practice log. When something misbehaves later, these are your reference values.</li></ol><p><strong>Test:</strong> both rails within range. If 3.3V reads low, unplug and look for a short before going on.</p></section>
+<section class="chapter" id="lesson-1-digital-io-and-timing"><h2>Lesson 1: Digital I/O and timing</h2><p class="goal"><strong>Goal:</strong> drive LEDs, read buttons reliably, and do several things at once without <code>delay()</code>. <strong>Time:</strong> 2.5 hours. <strong>Pass:</strong> the debounced counter in Exercise 1.3 counts exactly 50 for 50 presses, while an LED keeps blinking undisturbed.</p><p><strong>Parts:</strong> breadboard, a red LED, a 470 Ω resistor, a tactile pushbutton, jumper wires.</p><figure><img src="diagrams/05-led-button-schematic.svg" alt="An LED out, a button in: the two circuits behind every project"><figcaption>An output pin drives the LED through a resistor that sets the current. The button pulls an input pin to GND; the Teensy's internal pull-up holds it high the rest of the time, so a press reads <code>LOW</code>.</figcaption></figure><figure><img src="diagrams/06-breadboard-led-button.svg" alt="Breadboard view: Teensy across the trench, parts to the right"><figcaption>The Teensy straddles the centre trench; each pin owns one numbered column, with three free holes above and two below. Jumpers take the signals to the free part of the board.</figcaption></figure><h3 id="exercise-11-an-led-of-your-own">Exercise 1.1: An LED of your own</h3><p><strong>Resistor maths.</strong> A red LED drops about 2.0 V. The pin gives 3.3 V, so the resistor sees 1.3 V. At 470 Ω that is 1.3 / 470 ≈ 2.8 mA: bright enough, and safely under the 4 mA per pin.</p><ol><li>Wire pin 11 → 470 Ω → LED long leg (anode); LED short leg (flat side) → GND, as in the drawings.</li><li>Change <code>ledPin</code> in the Blink sketch to 11 and upload.</li><li>Swap the LED around on purpose. Nothing breaks; it just stays dark. Turn it back.</li></ol><p><strong>Test:</strong> the external LED blinks. Measure across the resistor with the meter while the LED is on: about 1.3 V.</p><h3 id="exercise-12-read-a-button-and-meet-bounce">Exercise 1.2: Read a button, and meet bounce</h3><div class="code"><div class="code-label">button_raw.ino</div><pre><code>// Count presses the naive way: every HIGH to LOW change is a "press".
+const int buttonPin = 2;
+int lastState = HIGH;
+unsigned long presses = 0;
+
+void setup() {
+  pinMode(buttonPin, INPUT_PULLUP);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int state = digitalRead(buttonPin);
+  if (lastState == HIGH &amp;&amp; state == LOW) {
+    presses++;
+    Serial.printf("presses: %lu\n", presses);
+  }
+  lastState = state;
+}</code></pre></div><ol><li>Wire the button between pin 2 and GND, upload, open the Serial Monitor.</li><li>Press 20 times, slowly and deliberately. Write down the count.</li></ol><p><strong>Test:</strong> the count is almost certainly more than 20. That is contact bounce: the metal contacts hit, spring apart and hit again several times within a few milliseconds, and the Teensy is fast enough to see every one.</p><figure><img src="diagrams/07-bounce-timing.svg" alt="One press, four presses: why buttons need debouncing"><figcaption>The raw contact flickers for a few milliseconds on press and on release. The Bounce library waits until the pin has been steady for the whole interval before it reports a single, clean change.</figcaption></figure><h3 id="exercise-13-debounce-with-the-bounce2-library">Exercise 1.3: Debounce with the Bounce2 library</h3><p>Teensyduino ships the Bounce2 library. Its <code>Bounce</code> class watches one pin; <code>update()</code> must be called often, and <code>fell()</code> / <code>rose()</code> are true for exactly one call after a debounced change.</p><div class="code"><div class="code-label">button_bounce.ino</div><pre><code>// One press = one count. The LED on pin 11 toggles on every press.
+#include &lt;Bounce2.h&gt;
+
+const int buttonPin = 2, ledPin = 11;
+Bounce button;
+bool ledOn = false;
+unsigned long presses = 0;
+
+void setup() {
+  button.attach(buttonPin, INPUT_PULLUP);  // also sets the pin mode
+  button.interval(10);                     // milliseconds of steadiness
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  button.update();
+  if (button.fell()) {                     // HIGH to LOW = pressed
+    presses++;
+    ledOn = !ledOn;
+    digitalWrite(ledPin, ledOn);
+    Serial.printf("presses: %lu\n", presses);
+  }
+}</code></pre></div><ol><li>Upload and press 50 times, counting yourself.</li><li>Try <code>interval(1)</code> and see bounce creep back in; then try <code>interval(50)</code> and notice that very fast double-taps start to merge.</li></ol><p><strong>Test:</strong> 50 presses give exactly 50. Settle on 5–10 ms for tactile buttons.</p><aside class="callout note"><p><strong>Note:</strong> You will also see <code>#include &lt;Bounce.h&gt;</code> with <code>fallingEdge()</code> and <code>risingEdge()</code> in older Teensy examples. That is the original Bounce library, also included; the calls in this course use Bounce2, which is maintained.</p></aside><h3 id="exercise-14-several-things-at-once-with-elapsedmillis">Exercise 1.4: Several things at once with elapsedMillis</h3><p><code>delay()</code> freezes the whole program. The Teensy-specific <code>elapsedMillis</code> type is a variable that counts up by itself; you check it and subtract the period, and the loop stays free for other work.</p><div class="code"><div class="code-label">two_rates.ino</div><pre><code>// Two LEDs at two rates, and a button that stays responsive.
+#include &lt;Bounce2.h&gt;
+
+elapsedMillis fastTimer, slowTimer;
+bool fastOn = false, slowOn = false;
+Bounce button;
+
+void setup() {
+  pinMode(13, OUTPUT);
+  pinMode(11, OUTPUT);
+  button.attach(2, INPUT_PULLUP);
+  button.interval(10);
+  Serial.begin(9600);
+}
+
+void loop() {
+  if (fastTimer &gt;= 100) {        // every 100 ms
+    fastTimer -= 100;            // subtract, so no drift builds up
+    fastOn = !fastOn;
+    digitalWrite(13, fastOn);
+  }
+  if (slowTimer &gt;= 700) {        // every 700 ms
+    slowTimer -= 700;
+    slowOn = !slowOn;
+    digitalWrite(11, slowOn);
+  }
+  button.update();
+  if (button.fell()) Serial.println("pressed, and nothing stuttered");
+}</code></pre></div><p><strong>Test:</strong> both LEDs keep their own rhythm while you hammer the button, and every press is reported at once. <code>elapsedMicros</code> works the same way in microseconds.</p><h3 id="exercise-15-intervaltimer-and-interrupts">Exercise 1.5: IntervalTimer and interrupts</h3><p>Sometimes timing must not depend on the loop at all. <code>IntervalTimer</code> calls a function from a hardware timer at a fixed rate (the Teensy 4.1 has four of them), and <code>attachInterrupt()</code> calls a function the instant a pin changes. Both functions run <em>inside</em> an interrupt: keep them tiny, mark shared variables <code>volatile</code>, and never print from them.</p><div class="code"><div class="code-label">timer_interrupt.ino</div><pre><code>// A hardware timer blinks pin 13; a pin interrupt counts falling edges on pin 2.
+IntervalTimer blinkTimer;
+volatile bool ledState = false;
+volatile uint32_t edgeCount = 0;
+
+void blinkISR() {
+  ledState = !ledState;
+  digitalWriteFast(13, ledState);
+}
+
+void buttonISR() {
+  edgeCount++;
+}
+
+void setup() {
+  pinMode(13, OUTPUT);
+  pinMode(2, INPUT_PULLUP);
+  blinkTimer.begin(blinkISR, 250000);              // every 250 000 µs
+  attachInterrupt(digitalPinToInterrupt(2), buttonISR, FALLING);
+  Serial.begin(9600);
+}
+
+void loop() {
+  noInterrupts();
+  uint32_t n = edgeCount;                          // copy safely
+  interrupts();
+  Serial.printf("edges seen by the interrupt: %lu\n", n);
+  delay(1000);                                     // the LED blinks on regardless
+}</code></pre></div><ol><li>Upload. The LED blinks at 2 Hz even though <code>loop()</code> spends all its time in <code>delay()</code>.</li><li>Press the button 10 times. The interrupt counts every bounce: expect more than 10. Interrupts are for fast, clean signals (encoders, sensors), not for raw buttons.</li></ol><p><strong>Test:</strong> steady blink during <code>delay()</code>, and you can explain why the edge count is higher than the press count.</p><h3 id="exercise-16-how-fast-is-a-pin">Exercise 1.6: How fast is a pin?</h3><p>The processor counts its own clock cycles in <code>ARM_DWT_CYCCNT</code>. That lets you time code without an oscilloscope.</p><div class="code"><div class="code-label">toggle_speed.ino</div><pre><code>// Compare digitalWrite() and digitalWriteFast() on pin 11.
+const int pin = 11;
+
+void setup() {
+  pinMode(pin, OUTPUT);
+  Serial.begin(9600);
+  while (!Serial &amp;&amp; millis() &lt; 4000) { }
+
+  uint32_t t0 = ARM_DWT_CYCCNT;
+  for (int i = 0; i &lt; 1000; i++) { digitalWrite(pin, HIGH); digitalWrite(pin, LOW); }
+  uint32_t slow = ARM_DWT_CYCCNT - t0;
+
+  t0 = ARM_DWT_CYCCNT;
+  for (int i = 0; i &lt; 1000; i++) { digitalWriteFast(pin, HIGH); digitalWriteFast(pin, LOW); }
+  uint32_t fast = ARM_DWT_CYCCNT - t0;
+
+  Serial.printf("digitalWrite:     %.1f ns per pulse\n", slow * 1e9 / F_CPU_ACTUAL / 1000);
+  Serial.printf("digitalWriteFast: %.1f ns per pulse\n", fast * 1e9 / F_CPU_ACTUAL / 1000);
+}
+
+void loop() {
+  while (true) {                      // a square wave as fast as the loop allows
+    digitalWriteFast(pin, HIGH);
+    digitalWriteFast(pin, LOW);
+  }
+}</code></pre></div><ol><li>Upload and read the two numbers. <code>digitalWriteFast()</code> with a constant pin number compiles to a single register write.</li><li>With the LED removed, put the meter on pin 11: DC volts reads roughly half of 3.3 V, the average of a square wave far too fast for the meter to follow.</li><li>Change the CPU Speed menu to 150 MHz and run it again.</li></ol><p><strong>Test:</strong> <code>digitalWriteFast()</code> is several times faster, and both scale with the CPU speed. Record the numbers in the log.</p></section>
+<section class="chapter" id="lesson-2-analog-in-pwm-out-and-switching-real-loads"><h2>Lesson 2: Analog in, PWM out, and switching real loads</h2><p class="goal"><strong>Goal:</strong> read voltages, scale bigger ones safely, make "in-between" outputs with PWM, and switch 12 V loads with a MOSFET. <strong>Time:</strong> 3 hours. <strong>Pass:</strong> the battery voltmeter agrees with your multimeter within 2 %, and a knob dims a 12 V LED strip smoothly from off to full with no flicker or whine.</p><p><strong>Parts:</strong> a 10 kΩ pot, 47 kΩ, 10 kΩ and 100 Ω resistors, a 100 nF capacitor, an IRLB8721 MOSFET, a 1N5819 diode, the 12 V supply, LED strip and motor.</p><h3 id="exercise-21-read-a-knob">Exercise 2.1: Read a knob</h3><p>The ADC turns 0–3.3 V into a number: 0–1023 by default (10 bits), about 3.2 mV per step. The range is fixed; <code>analogReference()</code> does nothing on a Teensy 4.</p><div class="code"><div class="code-label">knob.ino</div><pre><code>// Print a pot on A0 as a raw number and in volts. Try Tools &gt; Serial Plotter.
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  int raw = analogRead(A0);
+  float volts = raw * 3.3 / 1023.0;
+  Serial.printf("raw:%d volts:%.3f\n", raw, volts);
+  delay(20);
+}</code></pre></div><ol><li>Wire the pot: outer legs to 3.3V and GND, wiper to pin 14 (A0). See part A of the drawing below.</li><li>Upload, open <strong>Tools ▸ Serial Plotter</strong> and turn the knob end to end.</li></ol><p><strong>Test:</strong> 0 at one end, 1023 (or 1022) at the other, a smooth line in between.</p><figure><img src="diagrams/09-analog-inputs.svg" alt="Analog in: a knob on A0, a 12 V battery on A1"><figcaption>The pot divides 3.3 V. For anything higher, a divider scales the voltage down first; its top resistor also limits the current if the input is ever overvoltage.</figcaption></figure><h3 id="exercise-22-noise-and-averaging">Exercise 2.2: Noise and averaging</h3><p>Leave the knob still and look at the plotter: the last digit wanders. Some of that is real noise on the wire, some is the ADC itself.</p><div class="code"><div class="code-label">averaging.ino</div><pre><code>// Compare one reading, hardware averaging and a software low-pass filter.
+float smooth = 0;
+
+void setup() {
+  Serial.begin(9600);
+  analogReadResolution(12);          // 0-4095; about 10 bits are truly quiet
+}
+
+void loop() {
+  analogReadAveraging(1);
+  int single = analogRead(A0);
+  analogReadAveraging(16);           // the ADC averages 16 samples itself
+  int averaged = analogRead(A0);
+  smooth += 0.1 * (averaged - smooth);
+  Serial.printf("single:%d avg16:%d smooth:%.1f\n", single, averaged, smooth);
+  delay(10);
+}</code></pre></div><ol><li>Watch the three traces with the knob still, then turn it quickly.</li><li>Change the 0.1 to 0.02 and to 0.5. Smaller is quieter but slower to follow.</li></ol><p><strong>Test:</strong> you can explain the trade-off you see: smoothing removes jitter and adds lag. You will use exactly this filter for the MIDI knobs in Lesson 3.</p><h3 id="exercise-23-a-battery-voltmeter">Exercise 2.3: A battery voltmeter</h3><p>Build part B of the drawing on the breadboard: +12 V → 47 kΩ → A1 (pin 15) → 10 kΩ → GND, with 100 nF from A1 to GND. Join the battery's (or supply's) minus to the Teensy's GND. The divider ratio is (47 + 10) / 10 = 5.7, so 12.6 V becomes 2.21 V, and anything up to 18.8 V stays inside the ADC's range.</p><div class="code"><div class="code-label">battery_meter.ino</div><pre><code>// Measure up to about 18 V on A1 through a 47k / 10k divider.
+const float RATIO = (47.0 + 10.0) / 10.0;
+const float CAL = 1.000;   // set this after comparing with your meter
+
+void setup() {
+  Serial.begin(9600);
+  analogReadResolution(12);
+  analogReadAveraging(32);
+}
+
+void loop() {
+  int raw = analogRead(A1);
+  float volts = raw * 3.3 / 4095.0 * RATIO * CAL;
+  Serial.printf("raw %4d   battery %.2f V\n", raw, volts);
+  delay(500);
+}</code></pre></div><ol><li>Before connecting the Teensy, measure the divider's midpoint with the meter while 12 V is applied: it must be under 3.3 V.</li><li>Connect A1, upload and compare the reading with the meter on the 12 V terminals.</li><li>Set <code>CAL</code> to meter reading ÷ sketch reading (resistor tolerance is the usual error) and upload again.</li></ol><p><strong>Test:</strong> within 2 % of the meter over the whole range your supply can do.</p><aside class="callout warn"><p><strong>Warning:</strong> Check the divider's output with the meter <em>before</em> it touches a pin. A swapped pair of resistors puts 10 V on A1.</p></aside><h3 id="exercise-24-fade-an-led-with-pwm">Exercise 2.4: Fade an LED with PWM</h3><p><code>analogWrite()</code> does not make an analog voltage. It switches the pin fully on and off thousands of times a second, and the fraction of time it is on (the duty cycle) sets the average. An LED or a motor responds to the average.</p><figure><img src="diagrams/08-pwm-waveforms.svg" alt="PWM: the pin is only ever 0 V or 3.3 V; the duty cycle sets the average"><figcaption>The default is 8-bit (0–255) at about 4.48 kHz on most pins. <code>analogWriteFrequency()</code> changes the frequency for a pin and any pins sharing its timer; <code>analogWriteResolution()</code> changes the number range for all pins.</figcaption></figure><div class="code"><div class="code-label">fade.ino</div><pre><code>// Breathe the LED on pin 11.
+const int ledPin = 11;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  for (int v = 0; v &lt;= 255; v++) { analogWrite(ledPin, v); delay(4); }
+  for (int v = 255; v &gt;= 0; v--) { analogWrite(ledPin, v); delay(4); }
+}</code></pre></div><ol><li>Upload. Notice that the LED seems to change little in the upper half: your eye is logarithmic.</li><li>Replace <code>analogWrite(ledPin, v)</code> with <code>analogWrite(ledPin, v * v / 255)</code> in both lines. The fade now looks even.</li></ol><p><strong>Test:</strong> a smooth, even breathing LED. Only pins with the PWM glyph on the pinout can do this.</p><h3 id="exercise-25-switch-12-v-with-a-mosfet">Exercise 2.5: Switch 12 V with a MOSFET</h3><p>A pin gives 4 mA at 3.3 V; a metre of LED strip wants an amp or more at 12 V. A logic-level N-channel MOSFET bridges the gap: the pin only charges its gate, and the load current flows from the 12 V supply through the load and the MOSFET to ground.</p><figure><img src="diagrams/10-mosfet-driver.svg" alt="Switching 12 V loads: a logic-level MOSFET on the low side"><figcaption>The load sits between +12 V and the drain; the source goes to ground. The 100 Ω resistor limits the pin current while the gate charges, the 10 kΩ keeps the MOSFET off while the Teensy boots, and the diode across the motor absorbs the voltage spike when the current stops.</figcaption></figure><div class="code"><div class="code-label">strip_dimmer.ino</div><pre><code>// A knob on A0 dims a 12 V LED strip through a MOSFET on pin 5.
+const int gatePin = 5;
+
+void setup() {
+  analogWriteFrequency(gatePin, 20000);   // 20 kHz: no audible whine, no flicker
+  analogWriteResolution(10);              // 0-1023, same range as analogRead
+}
+
+void loop() {
+  int knob = analogRead(A0);
+  int duty = (long)knob * knob / 1023;    // even-looking brightness steps
+  analogWrite(gatePin, duty);
+  delay(5);
+}</code></pre></div><ol><li>Build part A with the 12 V supply <strong>switched off</strong>. Q1's legs, facing the printed side, are G, D, S from left to right.</li><li>Check with the meter: no continuity between +12 V and any Teensy pin; Teensy GND and supply minus are joined.</li><li>Upload with only USB connected, then switch on the 12 V supply and turn the knob.</li><li>Replace the strip with the motor and add D1 across it, band towards +12 V. Run it from slow to full.</li><li>Touch Q1 after a minute at full power. With the strip used here it should stay barely warm.</li></ol><p><strong>Test:</strong> smooth dimming from off to full with no flicker; the motor runs smoothly from slow to full without the Teensy resetting. If the Teensy resets when the motor starts, see "brownouts" in Troubleshooting.</p><aside class="callout warn"><p><strong>Warning:</strong> Keep 12 V on its own side of the breadboard and away from the Teensy's pins. Only the grounds are joined. Do not adapt this circuit to mains voltage.</p></aside></section>
+<section class="chapter" id="lesson-3-usb-device-types-the-teensy-superpower"><h2>Lesson 3: USB device types, the Teensy superpower</h2><p class="goal"><strong>Goal:</strong> make the Teensy appear to the Mac as a MIDI instrument and as a keyboard, with nothing but a menu choice and a few library calls. <strong>Time:</strong> 2.5 hours. <strong>Pass:</strong> four keys and four knobs play and shape a software instrument in GarageBand (or any DAW) with no stuck notes and no knob jitter, and the macro pad's four keys do what their labels say.</p><p><strong>Parts:</strong> four buttons and four 10 kΩ pots on the breadboard (wired as below).</p><figure><img src="diagrams/12-usb-types.svg" alt="One board, many devices: the USB Type menu"><figcaption>The USB Type you choose is compiled into the sketch. After the upload the Teensy disconnects and comes back as the new kind of device; the Mac needs no driver for any of them.</figcaption></figure><h3 id="exercise-31-wire-the-controller">Exercise 3.1: Wire the controller</h3><figure><img src="diagrams/11-midi-controller.svg" alt="USB MIDI controller: four keys, four knobs, one cable"><figcaption>Buttons on pins 2–5 switch to GND, so they need no resistors. Pots divide 3.3 V into A0–A3 (pins 14–17). Flags with the same name are connected.</figcaption></figure><ol><li>Wire the four buttons and four pots. Keep the pot wires short and away from the USB cable.</li><li>Before uploading the MIDI sketch, run the knob sketch from Exercise 2.1 on A1, A2 and A3 in turn, and the Bounce sketch on pins 3, 4 and 5. Find wiring faults now, not inside a DAW.</li></ol><p><strong>Test:</strong> every pot reads 0 to 1023, every button counts cleanly.</p><h3 id="exercise-32-the-usb-midi-controller">Exercise 3.2: The USB MIDI controller</h3><p>Set <strong>Tools ▸ USB Type ▸ Serial + MIDI</strong> before uploading. (Plain <strong>MIDI</strong> works too, but you lose the normal serial port.)</p><div class="code long"><div class="code-label">midi_controller.ino</div><pre><code>// Four keys send notes, four knobs send Control Change messages.
+// Tools &gt; USB Type: "Serial + MIDI"
+#include &lt;Bounce2.h&gt;
+
+const int channel = 1;
+const int buttonPins[4] = {2, 3, 4, 5};
+const int notes[4] = {60, 62, 64, 65};      // C4 D4 E4 F4
+const int potPins[4] = {A0, A1, A2, A3};
+const int ccNumbers[4] = {1, 7, 10, 74};    // mod wheel, volume, pan, brightness
+Bounce buttons[4];
+float smooth[4];
+int lastRaw[4] = {-100, -100, -100, -100};
+int lastCC[4] = {-1, -1, -1, -1};
+elapsedMillis potTimer;
+
+void setup() {
+  for (int i = 0; i &lt; 4; i++) {
+    buttons[i].attach(buttonPins[i], INPUT_PULLUP);
+    buttons[i].interval(5);
+    smooth[i] = analogRead(potPins[i]);
+  }
+}
+
+void loop() {
+  for (int i = 0; i &lt; 4; i++) {
+    buttons[i].update();
+    if (buttons[i].fell()) usbMIDI.sendNoteOn(notes[i], 99, channel);
+    if (buttons[i].rose()) usbMIDI.sendNoteOff(notes[i], 0, channel);
+  }
+  if (potTimer &gt;= 5) {                       // read the knobs 200 times a second
+    potTimer = 0;
+    for (int i = 0; i &lt; 4; i++) {
+      smooth[i] += 0.2 * (analogRead(potPins[i]) - smooth[i]);
+      int raw = (int)smooth[i];
+      if (abs(raw - lastRaw[i]) &gt;= 8) {      // hysteresis: ignore small wobble
+        lastRaw[i] = raw;
+        int cc = raw &gt;&gt; 3;                   // 0-1023 to 0-127
+        if (cc != lastCC[i]) {
+          lastCC[i] = cc;
+          usbMIDI.sendControlChange(ccNumbers[i], cc, channel);
+        }
+      }
+    }
+  }
+  while (usbMIDI.read()) { }                 // read and ignore incoming MIDI
+}</code></pre></div><ol><li>Upload. Open <strong>Audio MIDI Setup</strong> (in Applications ▸ Utilities), choose <strong>Window ▸ Show MIDI Studio</strong>: a "Teensy MIDI" device is there.</li><li>Open MIDI Monitor and press each key and turn each knob. Check each key sends one Note On and one Note Off, and each knob sends values only while it moves.</li><li>Open GarageBand, create a Software Instrument track and play the four keys. Turn knob 2 (CC 7, volume) and knob 1 (CC 1, modulation).</li></ol><p><strong>Test:</strong> no stuck notes after 100 fast presses; a knob left alone sends nothing for a whole minute in MIDI Monitor; every knob reaches both 0 and 127.</p><p>Three details make a controller feel professional, and the sketch has all three: <strong>smoothing</strong> (the low-pass filter from Exercise 2.2), <strong>hysteresis</strong> (a value only counts as new when it moves by a full MIDI step), and <strong>change detection</strong> (send nothing when nothing changed). The sketch also reads and discards incoming MIDI, as PJRC recommends for transmit-only controllers, so the Mac's messages never pile up.</p><aside class="callout tip"><p><strong>Tip:</strong> To rename the device from "Teensy MIDI", add a <code>name.c</code> file to the sketch as shown in File ▸ Examples ▸ Teensy ▸ USB_MIDI ▸ MIDI_name. Each Teensy can have its own name.</p></aside><h3 id="exercise-33-a-macro-pad">Exercise 3.3: A macro pad</h3><p>Set <strong>Tools ▸ USB Type ▸ Keyboard</strong> and <strong>Tools ▸ Keyboard Layout</strong> to your Mac's layout (for example US English or German). The first time, macOS opens the Keyboard Setup Assistant: close it, or let it identify the "keyboard" by pressing the keys it asks for on your real keyboard.</p><div class="code"><div class="code-label">macro_pad.ino</div><pre><code>// Four buttons: copy, paste, type a phrase, play/pause.
+// Tools &gt; USB Type: "Keyboard"
+#include &lt;Bounce2.h&gt;
+
+Bounce keys[4];
+const int keyPins[4] = {2, 3, 4, 5};
+
+void tap(int modifier, int key) {
+  if (modifier) Keyboard.press(modifier);
+  Keyboard.press(key);
+  delay(10);
+  Keyboard.releaseAll();
+}
+
+void setup() {
+  for (int i = 0; i &lt; 4; i++) {
+    keys[i].attach(keyPins[i], INPUT_PULLUP);
+    keys[i].interval(10);
+  }
+}
+
+void loop() {
+  for (int i = 0; i &lt; 4; i++) keys[i].update();
+  if (keys[0].fell()) tap(MODIFIERKEY_GUI, KEY_C);         // Command-C
+  if (keys[1].fell()) tap(MODIFIERKEY_GUI, KEY_V);         // Command-V
+  if (keys[2].fell()) Keyboard.print("Sent from a Teensy 4.1\n");
+  if (keys[3].fell()) tap(0, KEY_MEDIA_PLAY_PAUSE);        // music play/pause
+}</code></pre></div><ol><li>Open TextEdit, upload, and try each key.</li><li>Change the phrase, or make key 3 open Spotlight: <code>tap(MODIFIERKEY_GUI, KEY_SPACE)</code>.</li></ol><p><strong>Test:</strong> each key does exactly one thing per press.</p><aside class="callout warn"><p><strong>Warning:</strong> A keyboard sketch types into whatever window has focus. Only ever send keys in response to a button press, never in a timed loop: a runaway sketch can type into your Terminal. If it happens, unplug the Teensy, press the Program button while plugging it back in, and upload a harmless sketch.</p></aside></section>
+<section class="chapter" id="lesson-4-storage-and-time"><h2>Lesson 4: Storage and time</h2><p class="goal"><strong>Goal:</strong> keep data and know when it was taken: a data logger that writes timestamped CSV lines to the built-in microSD card and stops cleanly. <strong>Time:</strong> 2 hours. <strong>Pass:</strong> one hour of logging produces a file with 3600 lines (± 1), correct timestamps, no gaps, and it opens in Numbers or Excel.</p><p><strong>Parts:</strong> a microSD card (formatted FAT32 or exFAT), a CR2032 coin cell and holder, the pot on A0, the battery divider on A1 from Lesson 2, the button on pin 2.</p><h3 id="exercise-41-read-the-card">Exercise 4.1: Read the card</h3><p>The Teensy 4.1's socket is wired to the processor's fast 4-bit SD interface. The standard <code>SD</code> library reaches it with <code>SD.begin(BUILTIN_SDCARD)</code>; no SPI wiring, no chip-select pin.</p><div class="code"><div class="code-label">sd_list.ino</div><pre><code>// List the files on the built-in microSD card.
+#include &lt;SD.h&gt;
+
+void setup() {
+  Serial.begin(9600);
+  while (!Serial &amp;&amp; millis() &lt; 4000) { }
+  if (!SD.begin(BUILTIN_SDCARD)) {
+    Serial.println("No card, or the card is not readable");
+    return;
+  }
+  File root = SD.open("/");
+  while (true) {
+    File entry = root.openNextFile();
+    if (!entry) break;
+    Serial.printf("%-24s %10lu bytes\n", entry.name(), (unsigned long)entry.size());
+    entry.close();
+  }
+  Serial.printf("Card size: %lu MB\n", (unsigned long)(SD.totalSize() / 1048576));
+}
+
+void loop() { }</code></pre></div><p><strong>Test:</strong> the listing matches what Finder shows on the same card.</p><h3 id="exercise-42-set-and-keep-the-time">Exercise 4.2: Set and keep the time</h3><p>The Teensy 4.1 has a real-time clock with its crystal on board. Without a coin cell it forgets the time when power goes; with a CR2032 on VBAT it keeps running for years. The <code>TimeLib</code> library (included) turns the clock's seconds into dates.</p><ol><li>Solder the coin-cell holder's red lead to VBAT and black lead to GND (the inner pads beside the SD socket), with the cell <strong>out</strong>. Check polarity with the meter, then insert the cell. Expect about 3 V on VBAT.</li><li>Upload the sketch below.</li></ol><div class="code"><div class="code-label">rtc_clock.ino</div><pre><code>// Show the RTC time; set it by sending T followed by a Unix time.
+#include &lt;TimeLib.h&gt;
+
+time_t getTeensy3Time() { return Teensy3Clock.get(); }
+
+void setup() {
+  Serial.begin(9600);
+  setSyncProvider(getTeensy3Time);       // TimeLib asks the RTC every 5 minutes
+  if (timeStatus() != timeSet) Serial.println("RTC not set");
+}
+
+void loop() {
+  if (Serial.available() &amp;&amp; Serial.read() == 'T') {
+    time_t t = Serial.parseInt();
+    if (t &gt; 1700000000) {                // a plausible date after 2023
+      Teensy3Clock.set(t);
+      setTime(t);
+    }
+  }
+  Serial.printf("%04d-%02d-%02d %02d:%02d:%02d\n",
+                year(), month(), day(), hour(), minute(), second());
+  delay(1000);
+}</code></pre></div><ol start="3" style="counter-reset: step 2"><li>Uploading usually sets the clock to roughly your computer's time already. To set it exactly to your local time, run this in Terminal and type <code>T</code> followed by the number into the Serial Monitor's input line:</li></ol><div class="code"><div class="code-label">Terminal</div><pre><code>TZ=UTC date -j -f "%Y-%m-%d %H:%M:%S" "$(date '+%Y-%m-%d %H:%M:%S')" +%s</code></pre></div><ol start="4" style="counter-reset: step 3"><li>Unplug USB for a minute, plug it back in and check the time.</li></ol><p><strong>Test:</strong> after the power break the clock is still right to within a second or two.</p><h3 id="exercise-43-the-data-logger">Exercise 4.3: The data logger</h3><figure><img src="diagrams/13-sd-logger.svg" alt="Data logger: from a reading to a line on the card"><figcaption>Once a second the sketch reads, stamps and formats a line, and hands it to the library, which collects lines in RAM and writes the card in 512-byte blocks. <code>flush()</code> forces the write; <code>close()</code> flushes and finishes the file.</figcaption></figure><div class="code long"><div class="code-label">sd_logger.ino</div><pre><code>// One CSV line per second to a new LOGnnn.CSV; button on pin 2 closes the file.
+#include &lt;SD.h&gt;
+#include &lt;TimeLib.h&gt;
+#include &lt;Bounce2.h&gt;
+
+const int stopPin = 2, ledPin = 13;
+File logFile;
+Bounce stopButton;
+elapsedMillis tick;
+int linesSinceFlush = 0;
+bool logging = false;
+
+time_t getTeensy3Time() { return Teensy3Clock.get(); }
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(ledPin, OUTPUT);
+  stopButton.attach(stopPin, INPUT_PULLUP);
+  stopButton.interval(10);
+  setSyncProvider(getTeensy3Time);
+  analogReadResolution(12);
+  analogReadAveraging(16);
+  if (!SD.begin(BUILTIN_SDCARD)) { Serial.println("SD card missing"); return; }
+  char name[16];
+  for (int n = 1; n &lt; 1000; n++) {                 // first unused file name
+    snprintf(name, sizeof(name), "LOG%03d.CSV", n);
+    if (!SD.exists(name)) break;
+  }
+  logFile = SD.open(name, FILE_WRITE);
+  if (!logFile) { Serial.println("Cannot create the file"); return; }
+  logFile.println("time,pot,battery_V,cpu_C");
+  logging = true;
+  digitalWrite(ledPin, HIGH);                      // LED on = file open
+  Serial.printf("Logging to %s\n", name);
+}
+
+void loop() {
+  stopButton.update();
+  if (logging &amp;&amp; stopButton.fell()) {
+    logFile.close();
+    logging = false;
+    digitalWrite(ledPin, LOW);
+    Serial.println("File closed: safe to remove the card");
+  }
+  if (!logging || tick &lt; 1000) return;
+  tick -= 1000;
+  time_t t = now();
+  int pot = analogRead(A0);
+  float battery = analogRead(A1) * 3.3 / 4095.0 * 5.7;
+  char line[64];
+  snprintf(line, sizeof(line), "%04d-%02d-%02d %02d:%02d:%02d,%d,%.2f,%.1f",
+           year(t), month(t), day(t), hour(t), minute(t), second(t),
+           pot, battery, tempmonGetTemp());
+  logFile.println(line);
+  Serial.println(line);
+  if (++linesSinceFlush &gt;= 10) { logFile.flush(); linesSinceFlush = 0; }
+}</code></pre></div><ol><li>Upload, watch the lines in the Serial Monitor, turn the knob now and then.</li><li>After an hour, press the stop button, wait for the LED to go out, then remove the card and open the file on the Mac.</li><li>Make a chart of the pot column. Then run it again and pull the USB cable without pressing stop: open that file too and see what you lost.</li></ol><p><strong>Test:</strong> 3600 lines (± 1), timestamps one second apart, no gaps. The unplugged run loses at most the last ten lines.</p><p><code>FILE_WRITE</code> on the Teensy opens a file for appending, so restarting the same name adds to the end rather than overwriting. Flushing every line is safest but wears the card and costs time; every 10 lines is a reasonable middle.</p><h3 id="exercise-44-littlefs-in-program-flash">Exercise 4.4: LittleFS in program flash</h3><p>No card? The Teensy can keep a small file system in its own 8 MB flash, using the included LittleFS library. It is ideal for settings and short logs.</p><div class="code"><div class="code-label">littlefs_boots.ino</div><pre><code>// Count boots in a file kept in program flash.
+#include &lt;LittleFS.h&gt;
+
+LittleFS_Program flash;
+
+void setup() {
+  Serial.begin(9600);
+  while (!Serial &amp;&amp; millis() &lt; 4000) { }
+  if (!flash.begin(1024 * 1024)) { Serial.println("LittleFS failed"); return; }
+  File f = flash.open("boots.txt", FILE_WRITE);
+  f.printf("boot at %lu ms\n", millis());
+  f.close();
+  f = flash.open("boots.txt", FILE_READ);
+  while (f.available()) Serial.write(f.read());
+  f.close();
+  Serial.printf("used %lu of %lu bytes\n",
+                (unsigned long)flash.usedSize(), (unsigned long)flash.totalSize());
+}
+
+void loop() { }</code></pre></div><p><strong>Test:</strong> each reset adds a line. The data survives power cycles; it usually survives uploading a new sketch too, but do not rely on that for anything precious.</p></section>
+<section class="chapter" id="lesson-5-sound"><h2>Lesson 5: Sound</h2><p class="goal"><strong>Goal:</strong> make sound with the Teensy Audio library and no extra board, then build a synth you play from the Mac. <strong>Time:</strong> 2 hours. <strong>Pass:</strong> the synth plays clean notes from MidiKeys or a DAW, with no clicks at note start or end and no crackle, and a knob (CC 74) sweeps the filter.</p><p><strong>Parts:</strong> two 2.2 kΩ resistors, two 4.7 nF capacitors, two 10 µF electrolytics, a 3.5 mm jack, powered speakers (or a small amplifier and speaker).</p><figure><img src="diagrams/14-mqs-audio.svg" alt="Sound without a shield: MQS on pins 12 and 10"><figcaption>MQS ("medium quality sound") is a Teensy 4 feature that turns pins 12 (left) and 10 (right) into a fast pulse stream. The RC filter removes the high-frequency pulses, and the 10 µF capacitor blocks the DC offset before the line input.</figcaption></figure><p>The Audio library works like a patch bay. You create objects (oscillators, envelopes, filters, mixers, outputs), connect them with <code>AudioConnection</code> lines, reserve memory with <code>AudioMemory()</code>, and the library computes 44.1 kHz audio in the background while your <code>loop()</code> does other work. PJRC's <strong>Audio System Design Tool</strong> (pjrc.com/teensy/gui) lets you draw the graph in a browser and exports the code, and each object's help text is in the panel on the right.</p><h3 id="exercise-51-first-sound">Exercise 5.1: First sound</h3><ol><li>Build both filter channels on the breadboard. Jack tip to the left channel, ring to the right, sleeve to GND.</li><li>Set the speakers' volume low before connecting them.</li></ol><div class="code"><div class="code-label">mqs_beep.ino</div><pre><code>// Alternate 440 Hz and 660 Hz sine tones on MQS (pins 12 and 10).
+#include &lt;Audio.h&gt;
+
+AudioSynthWaveform osc;
+AudioOutputMQS     mqs;
+AudioConnection    c1(osc, 0, mqs, 0);   // left
+AudioConnection    c2(osc, 0, mqs, 1);   // right
+
+void setup() {
+  AudioMemory(10);
+  osc.begin(0.3, 440, WAVEFORM_SINE);    // amplitude 0-1, Hz, waveform
+}
+
+void loop() {
+  osc.frequency(440);
+  delay(500);
+  osc.frequency(660);
+  delay(500);
+}</code></pre></div><p><strong>Test:</strong> a clean two-tone beep from both speakers. Change <code>WAVEFORM_SINE</code> to <code>WAVEFORM_SQUARE</code> and <code>WAVEFORM_SAWTOOTH</code> and listen to the difference.</p><aside class="callout warn"><p><strong>Warning:</strong> Do not connect headphones straight to the pins or the filter. A pin can give only a few milliamps and full-scale output is loud. Use powered speakers or an amplifier, and start with the volume low.</p></aside><h3 id="exercise-52-a-synth-you-play-over-usb-midi">Exercise 5.2: A synth you play over USB MIDI</h3><p>Set <strong>Tools ▸ USB Type ▸ Serial + MIDI</strong>. The sketch registers functions that <code>usbMIDI.read()</code> calls whenever a message arrives.</p><div class="code long"><div class="code-label">usb_synth.ino</div><pre><code>// Monophonic synth: USB MIDI notes in, MQS audio out. CC 74 = cutoff, CC 71 = resonance.
+#include &lt;Audio.h&gt;
+
+AudioSynthWaveform       osc;
+AudioEffectEnvelope      env;
+AudioFilterStateVariable filter;
+AudioOutputMQS           mqs;
+AudioConnection c1(osc, env);
+AudioConnection c2(env, 0, filter, 0);
+AudioConnection c3(filter, 0, mqs, 0);   // output 0 of the filter = low-pass
+AudioConnection c4(filter, 0, mqs, 1);
+int currentNote = -1;
+
+void noteOn(byte channel, byte note, byte velocity) {
+  osc.frequency(440.0f * powf(2.0f, (note - 69) / 12.0f));
+  osc.amplitude(0.2f + 0.5f * velocity / 127.0f);
+  currentNote = note;
+  env.noteOn();
+}
+
+void noteOff(byte channel, byte note, byte velocity) {
+  if (note == currentNote) env.noteOff();
+}
+
+void controlChange(byte channel, byte control, byte value) {
+  if (control == 74) filter.frequency(80.0f * powf(2.0f, value / 18.0f));
+  if (control == 71) filter.resonance(0.7f + value * 4.3f / 127.0f);
+}
+
+void setup() {
+  AudioMemory(20);
+  osc.begin(0.5, 220, WAVEFORM_BANDLIMIT_SAWTOOTH);
+  env.attack(5);
+  env.decay(80);
+  env.sustain(0.6);
+  env.release(300);
+  filter.frequency(2000);
+  filter.resonance(1.2);
+  usbMIDI.setHandleNoteOn(noteOn);
+  usbMIDI.setHandleNoteOff(noteOff);
+  usbMIDI.setHandleControlChange(controlChange);
+}
+
+void loop() {
+  usbMIDI.read();
+}</code></pre></div><ol><li>Upload. In MidiKeys (or your DAW's MIDI output), choose "Teensy MIDI" as the destination and play.</li><li>Send CC 74 from MidiKeys' controls or a DAW knob and sweep the filter. Then CC 71.</li><li>Change <code>release(300)</code> to <code>release(1500)</code> and play staccato.</li><li>Add <code>Serial.printf("CPU %.1f%%, blocks %d\n", AudioProcessorUsageMax(), AudioMemoryUsageMax());</code> to <code>loop()</code> behind an <code>elapsedMillis</code> of one second, and check the synth uses only a few percent of the CPU.</li></ol><p><strong>Test:</strong> every note starts and ends without a click, no crackle while playing fast, the filter sweeps smoothly.</p><p>The envelope shapes each note's volume (attack, decay, sustain, release), which is what removes clicks. <code>WAVEFORM_BANDLIMIT_SAWTOOTH</code> avoids the harsh aliasing that a plain sawtooth produces on high notes. The Teensy treats a Note On with velocity 0 as a Note Off, which is what many keyboards send.</p><h3 id="going-further-the-audio-shield">Going further: the Audio Shield</h3><p>PJRC's <strong>Audio Adaptor Board Rev D</strong> for Teensy 4.x carries an SGTL5000 codec: real line in and out, a microphone input and a headphone amplifier with volume control. It uses <code>AudioOutputI2S</code> and <code>AudioControlSGTL5000</code> instead of <code>AudioOutputMQS</code>, and occupies pins 7, 8, 20, 21 and 23 for I2S audio and 18 and 19 for control (its own SD socket uses 10–13). Everything else in this lesson stays the same; swap the output object and add <code>sgtl5000_1.enable(); sgtl5000_1.volume(0.5);</code> to <code>setup()</code>.</p></section>
+<section class="chapter" id="lesson-6-talking-to-other-things"><h2>Lesson 6: Talking to other things</h2><p class="goal"><strong>Goal:</strong> connect the Teensy to other chips and devices over the five most useful links. <strong>Time:</strong> 3 hours (Ethernet optional). <strong>Pass:</strong> each exercise below passes its own test.</p><figure><img src="diagrams/15-i2c-serial.svg" alt="Talking to other chips: an I2C bus and two serial ports"><figcaption>I2C shares two wires among many chips, each with its own address; most breakouts already carry the pull-up resistors. Serial ports are point to point: one device's TX always goes to the other's RX, and the grounds are joined.</figcaption></figure><h3 id="exercise-61-hardware-serial-ports">Exercise 6.1: Hardware serial ports</h3><p>The Teensy 4.1 has eight hardware serial ports, <code>Serial1</code> to <code>Serial8</code>, separate from the USB <code>Serial</code>. Pins are on Card A; Serial1 is RX 0 / TX 1, Serial2 is RX 7 / TX 8.</p><div class="code"><div class="code-label">serial_loopback.ino</div><pre><code>// Serial1 and Serial2 talk to each other through two jumpers.
+void setup() {
+  Serial.begin(9600);
+  Serial1.begin(115200);
+  Serial2.begin(115200);
+}
+
+void loop() {
+  Serial1.println("ping from Serial1");
+  delay(50);
+  while (Serial2.available()) Serial.write(Serial2.read());
+  Serial2.println("pong from Serial2");
+  delay(50);
+  while (Serial1.available()) Serial.write(Serial1.read());
+  delay(900);
+}</code></pre></div><ol><li>Jumper pin 1 (TX1) to pin 7 (RX2), and pin 8 (TX2) to pin 0 (RX1).</li><li>Upload and open the Serial Monitor. Then pull one jumper and see which message stops.</li></ol><p><strong>Test:</strong> "ping" and "pong" alternate every second. Real serial devices (a GPS module, a DIN MIDI port, another microcontroller) connect the same way, at 3.3 V levels.</p><h3 id="exercise-62-an-i2c-sensor-and-an-oled">Exercise 6.2: An I2C sensor and an OLED</h3><p>Libraries: install <strong>Adafruit SSD1306</strong>, <strong>Adafruit GFX Library</strong> and <strong>Adafruit BME280 Library</strong> from the Library Manager (accept their dependencies). The bus is <code>Wire</code> on pins 18 (SDA) and 19 (SCL); <code>Wire1</code> and <code>Wire2</code> are on 17/16 and 25/24.</p><ol><li>Wire the BME280 and the OLED to 3.3V, GND, SDA and SCL as in the drawing. Read the pin names on your boards: OLED pin orders vary.</li><li>Run this scanner first. It must find 0x3C (the OLED) and 0x76 or 0x77 (the BME280).</li></ol><div class="code"><div class="code-label">i2c_scan.ino</div><pre><code>// List every I2C address that answers on Wire (pins 18 and 19).
+#include &lt;Wire.h&gt;
+
+void setup() {
+  Serial.begin(9600);
+  while (!Serial &amp;&amp; millis() &lt; 4000) { }
+  Wire.begin();
+  for (byte address = 1; address &lt; 127; address++) {
+    Wire.beginTransmission(address);
+    if (Wire.endTransmission() == 0) Serial.printf("found a device at 0x%02X\n", address);
+  }
+  Serial.println("scan done");
+}
+
+void loop() { }</code></pre></div><ol start="3" style="counter-reset: step 2"><li>Then upload the weather display, with the BME280 address the scanner found.</li></ol><div class="code"><div class="code-label">weather_oled.ino</div><pre><code>// BME280 temperature, humidity and pressure on a 128 x 64 OLED.
+#include &lt;Wire.h&gt;
+#include &lt;Adafruit_GFX.h&gt;
+#include &lt;Adafruit_SSD1306.h&gt;
+#include &lt;Adafruit_BME280.h&gt;
+
+Adafruit_SSD1306 display(128, 64, &amp;Wire, -1);   // -1: no reset pin
+Adafruit_BME280 bme;
+
+void setup() {
+  Serial.begin(9600);
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) Serial.println("OLED not found");
+  if (!bme.begin(0x76)) Serial.println("BME280 not found at 0x76: try 0x77");
+  display.setTextColor(SSD1306_WHITE);
+}
+
+void loop() {
+  float t = bme.readTemperature();
+  float h = bme.readHumidity();
+  float p = bme.readPressure() / 100.0;          // Pa to hPa
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setCursor(0, 0);
+  display.printf("%.1f C", t);
+  display.setTextSize(1);
+  display.setCursor(0, 28);
+  display.printf("%.0f %% humidity", h);
+  display.setCursor(0, 44);
+  display.printf("%.1f hPa", p);
+  display.display();
+  delay(1000);
+}</code></pre></div><p><strong>Test:</strong> the readings update every second; breathing on the sensor raises the humidity within seconds.</p><h3 id="exercise-63-can-bus-with-flexcant4">Exercise 6.3: CAN bus with FlexCAN_T4</h3><p>CAN is the robust two-wire bus of cars, machines and robots. The Teensy 4.1 has three CAN controllers (CAN1 on 22/23, CAN2 on 1/0, CAN3 on 31/30), but a CAN bus also needs a <strong>transceiver</strong> chip per node. Here one Teensy talks to itself: CAN1 and CAN2 each get an SN65HVD230 (a 3.3 V transceiver), and the two transceivers share a short bus.</p><figure><img src="diagrams/16-can-bus.svg" alt="CAN bus on one board: CAN1 talks to CAN2"><figcaption>The bus is CANH and CANL, ideally a twisted pair, with exactly one 120 Ω terminator at each end. Each transceiver turns the Teensy's TX/RX logic into the bus's differential signal.</figcaption></figure><div class="code"><div class="code-label">can_loopback.ino</div><pre><code>// CAN1 sends a frame every 500 ms; CAN2 receives and prints it. 500 kbit/s.
+#include &lt;FlexCAN_T4.h&gt;
+
+FlexCAN_T4&lt;CAN1, RX_SIZE_256, TX_SIZE_16&gt; can1;
+FlexCAN_T4&lt;CAN2, RX_SIZE_256, TX_SIZE_16&gt; can2;
+elapsedMillis sendTimer;
+uint8_t counter = 0;
+
+void setup() {
+  Serial.begin(9600);
+  can1.begin();
+  can1.setBaudRate(500000);
+  can2.begin();
+  can2.setBaudRate(500000);
+}
+
+void loop() {
+  if (sendTimer &gt;= 500) {
+    sendTimer = 0;
+    CAN_message_t msg;
+    msg.id = 0x123;
+    msg.len = 2;
+    msg.buf[0] = counter++;
+    msg.buf[1] = analogRead(A0) &gt;&gt; 2;          // the knob, 0-255
+    can1.write(msg);
+  }
+  CAN_message_t rx;
+  if (can2.read(rx)) {
+    Serial.printf("CAN2 got id 0x%03lX, %d bytes: %d %d\n", rx.id, rx.len, rx.buf[0], rx.buf[1]);
+  }
+}</code></pre></div><ol><li>Power off. Measure between CANH and CANL: about 60 Ω means two terminators (most SN65HVD230 boards carry one each). 120 Ω means one is missing; 40 Ω means one too many.</li><li>Wire both transceivers to 3.3V and GND, Teensy CTX to the transceiver's TX/D, CRX to its RX/R.</li><li>Upload and turn the knob.</li></ol><p><strong>Test:</strong> a frame every half second, the counter increasing and the second byte following the knob. Pull CANL: the frames stop; plug it back: they resume without a reset.</p><h3 id="exercise-64-usb-host-plug-a-keyboard-into-the-teensy">Exercise 6.4: USB host: plug a keyboard into the Teensy</h3><p>The Teensy 4.1's second USB port is a <strong>host</strong>: it powers and reads USB devices, just like a computer. It needs the five pads near the USB connector (+5V, D−, D+, GND, GND) and a host cable. Solder a 5-pin header to those pads and plug in PJRC's USB host cable, matching its GND marking to the GND pads.</p><div class="code"><div class="code-label">usb_host_midi.ino</div><pre><code>// Print notes from a USB MIDI keyboard plugged into the Teensy's host port.
+#include &lt;USBHost_t36.h&gt;
+
+USBHost myusb;
+USBHub hub1(myusb);
+MIDIDevice midi1(myusb);
+
+void onNoteOn(byte channel, byte note, byte velocity) {
+  Serial.printf("note on  ch %d  note %d  velocity %d\n", channel, note, velocity);
+}
+
+void onNoteOff(byte channel, byte note, byte velocity) {
+  Serial.printf("note off ch %d  note %d\n", channel, note);
+}
+
+void setup() {
+  Serial.begin(9600);
+  myusb.begin();
+  midi1.setHandleNoteOn(onNoteOn);
+  midi1.setHandleNoteOff(onNoteOff);
+}
+
+void loop() {
+  myusb.Task();
+  midi1.read();
+}</code></pre></div><p><strong>Test:</strong> keys on the USB MIDI keyboard print in the Serial Monitor. For a computer keyboard, open File ▸ Examples ▸ USBHost_t36 ▸ Mouse (it handles keyboards too). Extension: call the synth's <code>noteOn()</code> from Exercise 5.2 here, and the Teensy becomes a stand-alone instrument.</p><aside class="callout note"><p><strong>Note:</strong> The host port's 5 V comes from VIN through a current-limited switch. Small devices are fine; power hungry ones (hard drives, big keyboards with lights) need a powered hub.</p></aside><h3 id="exercise-65-optional-ethernet">Exercise 6.5 (optional): Ethernet</h3><p>If your board has the Ethernet chip, solder PJRC's MagJack kit to the six Ethernet pads (follow the kit's orientation photo) and plug in a network cable to your router. The QNEthernet library (included with recent Teensyduino; otherwise install it from the Library Manager) gives the board an IP address by DHCP.</p><div class="code"><div class="code-label">ethernet_status.ino</div><pre><code>// A tiny web page showing the knob and the CPU temperature.
+#include &lt;QNEthernet.h&gt;
+using namespace qindesign::network;
+
+EthernetServer server{80};
+
+void setup() {
+  Serial.begin(9600);
+  while (!Serial &amp;&amp; millis() &lt; 4000) { }
+  Ethernet.begin();                                   // DHCP
+  if (!Ethernet.waitForLocalIP(15000)) { Serial.println("No IP address"); return; }
+  IPAddress ip = Ethernet.localIP();
+  Serial.printf("Open http://%u.%u.%u.%u/\n", ip[0], ip[1], ip[2], ip[3]);
+  server.begin();
+}
+
+void loop() {
+  EthernetClient client = server.available();
+  if (!client) return;
+  delay(5);
+  while (client.available()) client.read();           // skip the request
+  client.printf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nConnection: close\r\n\r\n");
+  client.printf("A0 = %d\r\nCPU = %.1f C\r\n", analogRead(A0), tempmonGetTemp());
+  client.close();
+}</code></pre></div><p><strong>Test:</strong> the address opens in Safari on the same network, and reloading shows the knob's new value.</p></section>
+<section class="chapter" id="lesson-7-capstone-the-teensy-desk-synth"><h2>Lesson 7: Capstone, the Teensy desk synth</h2><p class="goal"><strong>Goal:</strong> build a finished instrument from everything so far: eight keys, four knobs and an OLED, playing four-voice sound on MQS and acting as a USB MIDI controller at the same time. <strong>Time:</strong> 3–4 hours. <strong>Pass:</strong> every box in the capstone test checklist is ticked.</p><p><strong>What it does.</strong> Each key plays a note on the built-in synth and sends the same note to the Mac. Each knob shapes the sound (filter cutoff, resonance, release time, volume) and sends a Control Change, so a DAW can record your knob moves. Notes and controls sent <em>from</em> the Mac also play the synth. The OLED shows the last note and the four knob positions.</p><p><strong>Parts:</strong> everything from Lessons 3 and 5, four more buttons, the OLED, two perfboards for the key strip and audio board, header strips and hook-up wire.</p><figure><img src="diagrams/17-capstone-schematic.svg" alt="Capstone schematic: the Teensy desk synth"><figcaption>Keys on pins 2–9 switch to GND; knobs on A0–A3; the OLED on I2C (18, 19); audio on MQS (12, 10) through the filter from Lesson 5. Pins 0, 1, 11, 13 and 20–41 stay free for extensions.</figcaption></figure><figure><img src="diagrams/18-capstone-layout.svg" alt="Capstone layout: the breadboard is the hub, the parts live on panels"><figcaption>Only the Teensy sits on the breadboard. Each labelled wire leaves a free hole next to its pin and goes to a small panel. Building the key strip and audio board on perfboard turns a breadboard experiment into something you can keep on the desk.</figcaption></figure><h3 id="build-order">Build order</h3><ol><li><strong>Audio board.</strong> Solder the two RC filters and the jack on perfboard (drawing 14), with three flying leads: L, R, GND. Test it with the beep sketch from Exercise 5.1.</li><li><strong>Key strip.</strong> Solder eight buttons in a row on perfboard with a common GND bus and nine flying leads (S1–S8, GND). Test each key with the Bounce sketch, moving the pin number.</li><li><strong>Knob panel.</strong> Four pots with a shared 3.3 V and GND, four wiper leads. Test each with the knob sketch.</li><li><strong>OLED.</strong> Four wires: GND, VCC (3.3 V), SCL, SDA. Run the I2C scanner: 0x3C.</li><li><strong>Wire everything to the breadboard</strong> as in the layout drawing. Before plugging in USB: no beep between 3.3V and GND.</li><li>Set <strong>Tools ▸ USB Type ▸ Serial + MIDI</strong>, <strong>CPU Speed 600 MHz</strong>, and upload the sketch.</li></ol><h3 id="the-sketch">The sketch</h3><div class="code long"><div class="code-label">desk_synth.ino</div><pre><code>// Teensy desk synth: 8 keys, 4 knobs, OLED, 4-voice MQS audio, USB MIDI in and out.
+// Tools &gt; USB Type: "Serial + MIDI"
+#include &lt;Audio.h&gt;
+#include &lt;Wire.h&gt;
+#include &lt;Bounce2.h&gt;
+#include &lt;Adafruit_GFX.h&gt;
+#include &lt;Adafruit_SSD1306.h&gt;
+
+const int VOICES = 4;
+AudioSynthWaveform       osc[VOICES];
+AudioEffectEnvelope      env[VOICES];
+AudioMixer4              mix;
+AudioFilterStateVariable filter;
+AudioAmplifier           volume;
+AudioOutputMQS           mqs;
+AudioConnection c0(osc[0], env[0]), c1(osc[1], env[1]), c2(osc[2], env[2]), c3(osc[3], env[3]);
+AudioConnection c4(env[0], 0, mix, 0), c5(env[1], 0, mix, 1);
+AudioConnection c6(env[2], 0, mix, 2), c7(env[3], 0, mix, 3);
+AudioConnection c8(mix, 0, filter, 0), c9(filter, 0, volume, 0);
+AudioConnection c10(volume, 0, mqs, 0), c11(volume, 0, mqs, 1);
+
+Adafruit_SSD1306 display(128, 64, &amp;Wire, -1);
+const int keyPins[8]  = {2, 3, 4, 5, 6, 7, 8, 9};
+const int keyNotes[8] = {60, 62, 64, 65, 67, 69, 71, 72};   // C4 to C5
+const int knobPins[4] = {A0, A1, A2, A3};
+const int knobCC[4]   = {74, 71, 72, 7};    // cutoff, resonance, release, volume
+const char *knobName[4] = {"cut", "res", "rel", "vol"};
+Bounce keys[8];
+int voiceNote[VOICES] = {-1, -1, -1, -1};
+int nextVoice = 0;
+int knobRaw[4] = {-100, -100, -100, -100};
+int knobValue[4] = {64, 20, 40, 100};
+char noteText[8] = "--";
+bool screenDirty = true;
+elapsedMillis knobTimer, screenTimer;
+
+void startNote(int note, int velocity) {
+  int v = nextVoice;                                   // steal round-robin if all busy
+  for (int i = 0; i &lt; VOICES; i++) if (voiceNote[i] &lt; 0) { v = i; break; }
+  nextVoice = (v + 1) % VOICES;
+  voiceNote[v] = note;
+  osc[v].frequency(440.0f * powf(2.0f, (note - 69) / 12.0f));
+  osc[v].amplitude(0.3f + 0.5f * velocity / 127.0f);
+  env[v].noteOn();
+  const char *names[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+  snprintf(noteText, sizeof(noteText), "%s%d", names[note % 12], note / 12 - 1);
+  screenDirty = true;
+}
+
+void stopNote(int note) {
+  for (int i = 0; i &lt; VOICES; i++) {
+    if (voiceNote[i] == note) { env[i].noteOff(); voiceNote[i] = -1; }
+  }
+}
+
+void applyKnob(int k, int value) {                     // value 0-127
+  knobValue[k] = value;
+  if (k == 0) filter.frequency(80.0f * powf(2.0f, value / 18.0f));     // 80 Hz to 10 kHz
+  if (k == 1) filter.resonance(0.7f + value * 4.3f / 127.0f);          // 0.7 to 5.0
+  if (k == 2) for (int i = 0; i &lt; VOICES; i++) env[i].release(20 + value * 15);
+  if (k == 3) volume.gain(value / 127.0f);
+  screenDirty = true;
+}
+
+void onNoteOn(byte channel, byte note, byte velocity) { startNote(note, velocity); }
+void onNoteOff(byte channel, byte note, byte velocity) { stopNote(note); }
+void onControlChange(byte channel, byte control, byte value) {
+  for (int k = 0; k &lt; 4; k++) if (control == knobCC[k]) applyKnob(k, value);
+}
+
+void drawScreen() {
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.print("Teensy desk synth");
+  display.setTextSize(2);
+  display.setCursor(0, 14);
+  display.print(noteText);
+  display.setTextSize(1);
+  for (int k = 0; k &lt; 4; k++) {
+    int x = k * 32;
+    display.setCursor(x, 38);
+    display.print(knobName[k]);
+    display.drawRect(x, 50, 28, 10, SSD1306_WHITE);
+    display.fillRect(x, 50, knobValue[k] * 28 / 127, 10, SSD1306_WHITE);
+  }
+  display.display();
+}
+
+void setup() {
+  AudioMemory(30);
+  for (int i = 0; i &lt; VOICES; i++) {
+    osc[i].begin(0.0, 220, WAVEFORM_BANDLIMIT_SAWTOOTH);
+    env[i].attack(5);
+    env[i].decay(80);
+    env[i].sustain(0.7);
+    mix.gain(i, 0.3);                                  // 4 voices cannot clip
+  }
+  for (int k = 0; k &lt; 4; k++) applyKnob(k, knobValue[k]);
+  for (int i = 0; i &lt; 8; i++) {
+    keys[i].attach(keyPins[i], INPUT_PULLUP);
+    keys[i].interval(5);
+  }
+  usbMIDI.setHandleNoteOn(onNoteOn);
+  usbMIDI.setHandleNoteOff(onNoteOff);
+  usbMIDI.setHandleControlChange(onControlChange);
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) Serial.println("OLED not found");
+  display.setTextColor(SSD1306_WHITE);
+}
+
+void loop() {
+  for (int i = 0; i &lt; 8; i++) {
+    keys[i].update();
+    if (keys[i].fell()) { startNote(keyNotes[i], 100); usbMIDI.sendNoteOn(keyNotes[i], 100, 1); }
+    if (keys[i].rose()) { stopNote(keyNotes[i]); usbMIDI.sendNoteOff(keyNotes[i], 0, 1); }
+  }
+  if (knobTimer &gt;= 5) {
+    knobTimer = 0;
+    for (int k = 0; k &lt; 4; k++) {
+      int raw = analogRead(knobPins[k]);
+      if (abs(raw - knobRaw[k]) &lt; 8) continue;         // hysteresis
+      knobRaw[k] = raw;
+      int value = raw &gt;&gt; 3;
+      if (value == knobValue[k]) continue;
+      applyKnob(k, value);
+      usbMIDI.sendControlChange(knobCC[k], value, 1);
+    }
+  }
+  usbMIDI.read();
+  if (screenDirty &amp;&amp; screenTimer &gt;= 100) {             // at most 10 redraws a second
+    screenTimer = 0;
+    screenDirty = false;
+    drawScreen();
+  }
+}</code></pre></div><h3 id="how-it-works">How it works</h3><ul><li><strong>Audio graph.</strong> Four oscillator-plus-envelope voices feed a four-input mixer, then one resonant filter, then a volume stage, then MQS. Each mixer input is set to 0.3, so four voices at full amplitude stay below clipping.</li><li><strong>Voice allocation.</strong> <code>startNote()</code> takes a free voice, or steals the next one in turn when all four are busy; <code>stopNote()</code> releases every voice playing that note.</li><li><strong>One knob function.</strong> <code>applyKnob()</code> is called from the physical knobs and from incoming Control Change messages, so the Mac and the panel always agree.</li><li><strong>Screen.</strong> Drawing the OLED takes tens of milliseconds over I2C, so it only happens when something changed and at most ten times a second. The audio keeps running meanwhile because the library works from interrupts.</li></ul><h3 id="capstone-test-checklist">Capstone test checklist</h3><ul class="tasks"><li class="task"><span class="box"></span>At power-on the OLED shows the title and four knob bars</li><li class="task"><span class="box"></span>Each of the eight keys plays its note (C4 to C5) and the OLED shows its name</li><li class="task"><span class="box"></span>Four keys held together all sound; a fifth steals a voice without a crash</li><li class="task"><span class="box"></span>Cutoff, resonance, release and volume knobs each do what they say, end to end</li><li class="task"><span class="box"></span>MIDI Monitor shows one Note On and one Note Off per key press, and CCs only while a knob moves</li><li class="task"><span class="box"></span>A DAW with MIDI output (Logic, Ableton Live Lite or Reaper; GarageBand cannot send MIDI out) records a key performance and, played back to "Teensy MIDI", the synth replays it</li><li class="task"><span class="box"></span>A CC 74 automation from the DAW moves the cutoff bar on the OLED</li><li class="task"><span class="box"></span>No clicks, no crackle, after 10 minutes of playing</li><li class="task"><span class="box"></span>Unplug and replug USB: it comes back without pressing anything</li></ul><h3 id="extensions">Extensions</h3><ul><li><strong>Presets in flash.</strong> Save the four knob values to <code>EEPROM</code> (the Teensy emulates 4 KB of it) on a long press of key 8, and load them in <code>setup()</code>.</li><li><strong>Second oscillator.</strong> Add a detuned saw per voice through a second mixer for a fatter sound.</li><li><strong>Arpeggiator.</strong> Use an <code>IntervalTimer</code> or <code>elapsedMillis</code> to step through held keys at a tempo set by a knob.</li><li><strong>Stand-alone.</strong> Add the USB host code from Exercise 6.4 so a MIDI keyboard plugged into the Teensy plays it, and power the whole thing from a USB power bank.</li><li><strong>Better audio.</strong> Swap MQS for the Audio Shield Rev D and <code>AudioOutputI2S</code>; the rest of the sketch is unchanged.</li><li><strong>Logging.</strong> Write every note with an RTC timestamp to the SD card, using Lesson 4's logger.</li></ul></section>
+<section class="chapter" id="troubleshooting"><h2>Troubleshooting</h2><p>Work from the top of each list: the first causes are the common ones.</p><h3 id="the-mac-does-not-see-the-teensy">The Mac does not see the Teensy</h3><ol><li><strong>Charge-only cable.</strong> The LED blinks but no port appears. Try a cable you know carries data.</li><li><strong>Hub or adapter.</strong> Plug straight into the Mac.</li><li><strong>USB Type with no serial port.</strong> After uploading a MIDI or Keyboard sketch, there is no <code>/dev/cu.usbmodem…</code> port; that is normal. The Teensy still appears under "Teensy ports" in the Port menu.</li><li><strong>Crashed sketch.</strong> A sketch that crashes very early can stop USB from starting. Press the Program button: the bootloader always answers, and the next upload replaces the sketch.</li></ol><h3 id="the-upload-hangs-or-fails">The upload hangs or fails</h3><ol><li>Press the <strong>Program</strong> button once while the IDE says it is waiting. This fixes nearly every stuck upload.</li><li>Close any other program holding the serial port (a second Serial Monitor, a terminal, CoolTerm).</li><li>Check <strong>Tools ▸ Board</strong> is Teensy 4.1 (not 4.0) and the port is the Teensy.</li><li>Last resort, the <strong>15-second restore</strong>: hold the Program button for about 15 seconds (the LED flashes briefly when the time is right), then release. The board erases itself and runs the factory blink. Upload again afterwards.</li></ol><h3 id="wrong-usb-type">Wrong USB Type</h3><ul><li>A MIDI sketch does nothing in the DAW: <strong>Tools ▸ USB Type</strong> was not set to MIDI or Serial + MIDI when you uploaded. <code>usbMIDI</code> calls compile only when a MIDI type is selected, so a compile error mentioning <code>usbMIDI</code> means the same thing.</li><li><code>Serial.print</code> output missing: plain MIDI and Keyboard types use an emulated serial port; select it in the Port menu, or choose a "Serial + …" type.</li></ul><h3 id="it-crashes-or-resets">It crashes or resets</h3><ul><li>Keep <code>if (CrashReport) Serial.print(CrashReport);</code> at the top of <code>setup()</code>. After a crash and automatic restart it prints the reason and the code address.</li><li>Typical causes: writing past the end of an array, using a pointer that was never set, very deep recursion, or a large local array inside a function (make it <code>static</code> or global).</li><li>An <code>IntervalTimer</code> or interrupt function that takes too long starves everything else: keep them short.</li></ul><h3 id="brownouts-the-board-resets-when-something-switches-on">Brownouts: the board resets when something switches on</h3><ul><li>A motor, solenoid or LED strip shares ground wiring with the Teensy and its start-up current makes the ground "bounce". Run separate thick ground wires from the load and from the Teensy to the supply's minus terminal (star ground).</li><li>Missing flyback diode on a motor or relay: the voltage spike resets or damages the board. Add the 1N5819.</li><li>Too much on the 3.3V pins: more than about 250 mA pulls the rail down. Power big loads from their own supply.</li></ul><h3 id="a-pin-stopped-working">A pin stopped working</h3><ul><li>Test it alone: Blink on that pin with only an LED and resistor attached. Then <code>INPUT_PULLUP</code> and <code>digitalRead()</code> with nothing connected: it must read 1.</li><li>A pin that once saw 5 V or more may be dead while the rest of the chip works. Move to another pin and find the cause before you reconnect anything.</li><li>If the whole board runs warm with nothing connected, or 3.3V reads low, the chip may be damaged. Disconnect everything and measure again.</li></ul><h3 id="analog-readings-are-noisy-or-wrong">Analog readings are noisy or wrong</h3><ul><li>Use the 3.3V pin, not VIN, for pots and sensors.</li><li>Average (Exercise 2.2), and add 100 nF from the analog pin to GND for high-resistance sources.</li><li>Long wires near the USB cable or a PWM-driven load pick up noise: shorten and separate them.</li></ul><h3 id="no-sound-or-bad-sound">No sound or bad sound</h3><ul><li>Check <code>AudioMemory()</code> is called, and that every object you hear is connected all the way to <code>AudioOutputMQS</code>.</li><li>Crackle: <code>AudioMemoryUsageMax()</code> reaching the number you reserved; reserve more.</li><li>Clicks at note start or end: envelope attack or release too short; use at least 2–5 ms.</li><li>Silence on one channel: check the jack's tip and ring wiring, and that both <code>mqs</code> inputs are connected.</li><li>MQS needs pins 10 and 12, so it cannot be used together with the SPI port.</li></ul></section>
+<section class="chapter" id="reference-cards-and-practice-log"><h2>Reference cards and practice log</h2><p>Cut these out or keep this page at the bench.</p><div class="card"><div class="cut">✂ cut along the dashed line</div><h3 id="card-a-pin-cheat-sheet-teensy-41-outer-pins">Card A: Pin cheat sheet (Teensy 4.1 outer pins)</h3><div class="table-wrap"><table><thead><tr><th>Function</th><th>Pins</th></tr></thead><tbody><tr><td>Analog inputs</td><td>A0–A9 = 14–23 · A10–A13 = 24–27 · A14–A17 = 38–41</td></tr><tr><td>PWM (outer pins)</td><td>0–15, 18, 19, 22–25, 28, 29, 33, 36, 37</td></tr><tr><td>Serial1 … Serial4</td><td>RX/TX: 0/1, 7/8, 15/14, 16/17</td></tr><tr><td>Serial5 … Serial8</td><td>RX/TX: 21/20, 25/24, 28/29, 34/35</td></tr><tr><td>I2C</td><td>Wire SDA/SCL 18/19 · Wire1 17/16 · Wire2 25/24</td></tr><tr><td>SPI</td><td>MOSI 11, MISO 12, SCK 13, CS 10 · SPI1 MOSI1 26, MISO1 1 (or 39), SCK1 27, CS1 0 (or 38)</td></tr><tr><td>CAN</td><td>CAN1 TX/RX 22/23 · CAN2 1/0 · CAN3 31/30</td></tr><tr><td>MQS audio</td><td>left 12, right 10</td></tr><tr><td>Audio shield (I2S)</td><td>7, 8, 20, 21, 23 plus I2C 18, 19</td></tr><tr><td>LED</td><td>13 (also SPI SCK)</td></tr><tr><td>Power</td><td>VIN 3.6–5.5 V in · 3.3V out, 250 mA spare · GND ×3</td></tr><tr><td>Inner pads</td><td>VBAT, 3.3V, GND, Program, On/Off · USB host +5V D− D+ GND GND · Ethernet ×6</td></tr></tbody></table></div></div><div class="card"><div class="cut">✂ cut along the dashed line</div><h3 id="card-b-electrical-limits">Card B: Electrical limits</h3><div class="table-wrap"><table><thead><tr><th>Quantity</th><th>Limit</th></tr></thead><tbody><tr><td>Voltage on any pin</td><td>0 to 3.3 V. Not 5 V tolerant, analog pins included</td></tr><tr><td>Current per pin</td><td>4 mA recommended</td></tr><tr><td>3.3V pins, total for your circuits</td><td>about 250 mA</td></tr><tr><td>VIN</td><td>3.6–5.5 V; joined to USB 5 V unless the VIN–VUSB link is cut</td></tr><tr><td>VBAT</td><td>3 V coin cell (CR2032)</td></tr><tr><td>ADC range</td><td>0–3.3 V, 10-bit default, 12-bit available (about 10 bits quiet)</td></tr><tr><td>LED on a pin</td><td>red: 470 Ω ≈ 2.8 mA</td></tr><tr><td>Dividers for higher voltage</td><td>47 kΩ / 10 kΩ: up to 18.8 V full scale</td></tr></tbody></table></div></div><div class="card"><div class="cut">✂ cut along the dashed line</div><h3 id="card-c-timing-and-api-crib">Card C: Timing and API crib</h3><div class="table-wrap"><table><thead><tr><th>You want</th><th>Write</th></tr></thead><tbody><tr><td>Wait, blocking</td><td><code>delay(ms)</code>, <code>delayMicroseconds(us)</code></td></tr><tr><td>Do something every N ms</td><td><code>elapsedMillis t; if (t &gt;= N) { t -= N; … }</code></td></tr><tr><td>Exact periodic call</td><td><code>IntervalTimer it; it.begin(func, microseconds);</code></td></tr><tr><td>React to a pin edge</td><td><code>attachInterrupt(digitalPinToInterrupt(p), func, FALLING);</code></td></tr><tr><td>Fast pin write</td><td><code>digitalWriteFast(pin, HIGH)</code> with a constant pin</td></tr><tr><td>Debounced button</td><td><code>Bounce b; b.attach(p, INPUT_PULLUP); b.interval(10); b.update(); b.fell()</code></td></tr><tr><td>Analog setup</td><td><code>analogReadResolution(12); analogReadAveraging(16);</code></td></tr><tr><td>PWM setup</td><td><code>analogWriteFrequency(pin, hz); analogWriteResolution(bits);</code></td></tr><tr><td>USB MIDI out</td><td><code>usbMIDI.sendNoteOn(note, vel, ch); usbMIDI.sendControlChange(cc, val, ch);</code></td></tr><tr><td>USB MIDI in</td><td><code>usbMIDI.setHandleNoteOn(fn); … usbMIDI.read();</code> in <code>loop()</code></td></tr><tr><td>SD card</td><td><code>SD.begin(BUILTIN_SDCARD); File f = SD.open(name, FILE_WRITE);</code></td></tr><tr><td>Clock</td><td><code>setSyncProvider(getTeensy3Time);</code> then <code>now()</code>, <code>year()</code>, <code>hour()</code></td></tr><tr><td>Crash reason</td><td><code>if (CrashReport) Serial.print(CrashReport);</code></td></tr><tr><td>CPU temperature, clock</td><td><code>tempmonGetTemp()</code>, <code>F_CPU_ACTUAL</code></td></tr></tbody></table></div></div><div class="card"><div class="cut">✂ cut along the dashed line</div><h3 id="card-d-before-every-power-up">Card D: Before every power-up</h3><ul class="tasks"><li class="task"><span class="box"></span>USB unplugged while wiring</li><li class="task"><span class="box"></span>No beep between 3.3V and GND, or between VIN and GND</li><li class="task"><span class="box"></span>Nothing above 3.3 V can reach any pin</li><li class="task"><span class="box"></span>12 V side switched off until the logic side works</li><li class="task"><span class="box"></span>Every motor or relay has its flyback diode</li><li class="task"><span class="box"></span>Right USB Type and port selected</li><li class="task"><span class="box"></span>Stuck? Press Program once</li></ul></div><h3 id="practice-log">Practice log</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Lesson / exercise</th><th>What I built or measured</th><th>Worked?</th><th>Problem found</th><th>Fix / next step</th></tr></thead><tbody><tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div></section>
+<section class="worksheet" id="worksheet-pin-label-strips"><h2>Worksheet 1: actual-size pin-label strips</h2>
+<p>Print this page at <b>100 % / actual size</b> (not "fit to page") and check the 50 mm bar first. Then cut out the strips you need and lay them beside the Teensy on the breadboard, so every pin carries its name and jobs. Set A matches the pinout drawing (USB at the top); set B matches the breadboard drawings (USB to the left).</p>
+<div class="card strips"><div class="cut">✂ cut along the lines</div><svg viewBox="0 0 168 206.74" width="168mm" height="206.74mm" font-family="Helvetica, Arial, sans-serif">
+    <text x="8" y="8" font-size="3.2" font-weight="bold">A. USB at the top (as in the pinout drawing)</text>
+    <text x="8" y="12.5" font-size="2.3">Cut out both strips; lay them beside the board, numbers next to the pins.</text>
+    <g transform="translate(8,24)"><rect x="0" y="0" width="27" height="60.96" fill="#fff" stroke="#000" stroke-width="0.25"/><rect x="18.8" y="0.35" width="7.8" height="1.84" fill="#000"/><text x="22.7" y="1.82" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#fff">GND</text><text x="18" y="1.78" text-anchor="end" font-size="1.55"></text><line x1="0" y1="2.54" x2="27" y2="2.54" stroke="#000" stroke-width="0.1"/><text x="22.7" y="4.36" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">0</text><text x="18" y="4.32" text-anchor="end" font-size="1.55">RX1 CRX2 CS1 ~</text><line x1="0" y1="5.08" x2="27" y2="5.08" stroke="#000" stroke-width="0.1"/><text x="22.7" y="6.9" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">1</text><text x="18" y="6.86" text-anchor="end" font-size="1.55">TX1 CTX2 MISO1 ~</text><line x1="0" y1="7.62" x2="27" y2="7.62" stroke="#000" stroke-width="0.1"/><text x="22.7" y="9.44" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">2</text><text x="18" y="9.4" text-anchor="end" font-size="1.55">~</text><line x1="0" y1="10.16" x2="27" y2="10.16" stroke="#000" stroke-width="0.1"/><text x="22.7" y="11.98" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">3</text><text x="18" y="11.94" text-anchor="end" font-size="1.55">~</text><line x1="0" y1="12.7" x2="27" y2="12.7" stroke="#000" stroke-width="0.1"/><text x="22.7" y="14.52" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">4</text><text x="18" y="14.479999999999999" text-anchor="end" font-size="1.55">~</text><line x1="0" y1="15.24" x2="27" y2="15.24" stroke="#000" stroke-width="0.1"/><text x="22.7" y="17.06" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">5</text><text x="18" y="17.02" text-anchor="end" font-size="1.55">~</text><line x1="0" y1="17.78" x2="27" y2="17.78" stroke="#000" stroke-width="0.1"/><text x="22.7" y="19.6" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">6</text><text x="18" y="19.560000000000002" text-anchor="end" font-size="1.55">~</text><line x1="0" y1="20.32" x2="27" y2="20.32" stroke="#000" stroke-width="0.1"/><text x="22.7" y="22.14" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">7</text><text x="18" y="22.1" text-anchor="end" font-size="1.55">RX2 ~</text><line x1="0" y1="22.86" x2="27" y2="22.86" stroke="#000" stroke-width="0.1"/><text x="22.7" y="24.68" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">8</text><text x="18" y="24.64" text-anchor="end" font-size="1.55">TX2 ~</text><line x1="0" y1="25.4" x2="27" y2="25.4" stroke="#000" stroke-width="0.1"/><text x="22.7" y="27.22" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">9</text><text x="18" y="27.18" text-anchor="end" font-size="1.55">~</text><line x1="0" y1="27.94" x2="27" y2="27.94" stroke="#000" stroke-width="0.1"/><text x="22.7" y="29.76" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">10</text><text x="18" y="29.720000000000002" text-anchor="end" font-size="1.55">MQSR CS ~</text><line x1="0" y1="30.48" x2="27" y2="30.48" stroke="#000" stroke-width="0.1"/><text x="22.7" y="32.3" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">11</text><text x="18" y="32.26" text-anchor="end" font-size="1.55">MOSI ~</text><line x1="0" y1="33.02" x2="27" y2="33.02" stroke="#000" stroke-width="0.1"/><text x="22.7" y="34.84" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">12</text><text x="18" y="34.800000000000004" text-anchor="end" font-size="1.55">MQSL MISO ~</text><line x1="0" y1="35.56" x2="27" y2="35.56" stroke="#000" stroke-width="0.1"/><rect x="18.8" y="35.910000000000004" width="7.8" height="1.84" fill="#000"/><text x="22.7" y="37.38" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#fff">3.3V</text><text x="18" y="37.34" text-anchor="end" font-size="1.55">out</text><line x1="0" y1="38.1" x2="27" y2="38.1" stroke="#000" stroke-width="0.1"/><text x="22.7" y="39.92" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">24</text><text x="18" y="39.88" text-anchor="end" font-size="1.55">A10 TX6 SCL2 ~</text><line x1="0" y1="40.64" x2="27" y2="40.64" stroke="#000" stroke-width="0.1"/><text x="22.7" y="42.46" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">25</text><text x="18" y="42.42" text-anchor="end" font-size="1.55">A11 RX6 SDA2 ~</text><line x1="0" y1="43.18" x2="27" y2="43.18" stroke="#000" stroke-width="0.1"/><text x="22.7" y="45" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">26</text><text x="18" y="44.96" text-anchor="end" font-size="1.55">A12 MOSI1</text><line x1="0" y1="45.72" x2="27" y2="45.72" stroke="#000" stroke-width="0.1"/><text x="22.7" y="47.54" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">27</text><text x="18" y="47.5" text-anchor="end" font-size="1.55">A13 SCK1</text><line x1="0" y1="48.26" x2="27" y2="48.26" stroke="#000" stroke-width="0.1"/><text x="22.7" y="50.08" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">28</text><text x="18" y="50.04" text-anchor="end" font-size="1.55">RX7 ~</text><line x1="0" y1="50.8" x2="27" y2="50.8" stroke="#000" stroke-width="0.1"/><text x="22.7" y="52.62" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">29</text><text x="18" y="52.58" text-anchor="end" font-size="1.55">TX7 ~</text><line x1="0" y1="53.34" x2="27" y2="53.34" stroke="#000" stroke-width="0.1"/><text x="22.7" y="55.160000000000004" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">30</text><text x="18" y="55.120000000000005" text-anchor="end" font-size="1.55">CRX3</text><line x1="0" y1="55.88" x2="27" y2="55.88" stroke="#000" stroke-width="0.1"/><text x="22.7" y="57.7" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">31</text><text x="18" y="57.660000000000004" text-anchor="end" font-size="1.55">CTX3</text><line x1="0" y1="58.42" x2="27" y2="58.42" stroke="#000" stroke-width="0.1"/><text x="22.7" y="60.24" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">32</text><text x="18" y="60.2" text-anchor="end" font-size="1.55"></text></g>
+    <rect x="36.5" y="20" width="17.78" height="64.96000000000001" rx="1" fill="none" stroke="#000" stroke-width="0.2" stroke-dasharray="1 0.8"/>
+    <rect x="41.39" y="18.5" width="8" height="5" fill="none" stroke="#000" stroke-width="0.2"/>
+    <text x="45.39" y="54" text-anchor="middle" font-size="2.2">Teensy 4.1</text>
+    <text x="45.39" y="57" text-anchor="middle" font-size="2.2">top view</text>
+    <circle cx="37.77" cy="25.27" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="25.27" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="27.81" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="27.81" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="30.349999999999998" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="30.349999999999998" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="32.89" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="32.89" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="35.43" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="35.43" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="37.970000000000006" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="37.970000000000006" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="40.510000000000005" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="40.510000000000005" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="43.050000000000004" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="43.050000000000004" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="45.59" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="45.59" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="48.13" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="48.13" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="50.67" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="50.67" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="53.21" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="53.21" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="55.75000000000001" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="55.75000000000001" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="58.290000000000006" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="58.290000000000006" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="60.830000000000005" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="60.830000000000005" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="63.370000000000005" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="63.370000000000005" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="65.91" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="65.91" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="68.45" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="68.45" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="70.99" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="70.99" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="73.52999999999999" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="73.52999999999999" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="76.07" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="76.07" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="78.61" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="78.61" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="81.14999999999999" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="81.14999999999999" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="37.77" cy="83.69" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/><circle cx="53.010000000000005" cy="83.69" r="0.55" fill="none" stroke="#000" stroke-width="0.15"/>
+    <g transform="translate(55.78,24)"><rect x="0" y="0" width="27" height="60.96" fill="#fff" stroke="#000" stroke-width="0.25"/><rect x="0.4" y="0.35" width="7.8" height="1.84" fill="#000"/><text x="4.3" y="1.82" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#fff">VIN</text><text x="9" y="1.78" text-anchor="start" font-size="1.55">3.6–5.5 V</text><line x1="0" y1="2.54" x2="27" y2="2.54" stroke="#000" stroke-width="0.1"/><rect x="0.4" y="2.89" width="7.8" height="1.84" fill="#000"/><text x="4.3" y="4.36" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#fff">GND</text><text x="9" y="4.32" text-anchor="start" font-size="1.55"></text><line x1="0" y1="5.08" x2="27" y2="5.08" stroke="#000" stroke-width="0.1"/><rect x="0.4" y="5.43" width="7.8" height="1.84" fill="#000"/><text x="4.3" y="6.9" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#fff">3.3V</text><text x="9" y="6.86" text-anchor="start" font-size="1.55">250 mA</text><line x1="0" y1="7.62" x2="27" y2="7.62" stroke="#000" stroke-width="0.1"/><text x="4.3" y="9.44" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">23</text><text x="9" y="9.4" text-anchor="start" font-size="1.55">A9 CRX1 ~</text><line x1="0" y1="10.16" x2="27" y2="10.16" stroke="#000" stroke-width="0.1"/><text x="4.3" y="11.98" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">22</text><text x="9" y="11.94" text-anchor="start" font-size="1.55">A8 CTX1 ~</text><line x1="0" y1="12.7" x2="27" y2="12.7" stroke="#000" stroke-width="0.1"/><text x="4.3" y="14.52" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">21</text><text x="9" y="14.479999999999999" text-anchor="start" font-size="1.55">A7 RX5</text><line x1="0" y1="15.24" x2="27" y2="15.24" stroke="#000" stroke-width="0.1"/><text x="4.3" y="17.06" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">20</text><text x="9" y="17.02" text-anchor="start" font-size="1.55">A6 TX5</text><line x1="0" y1="17.78" x2="27" y2="17.78" stroke="#000" stroke-width="0.1"/><text x="4.3" y="19.6" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">19</text><text x="9" y="19.560000000000002" text-anchor="start" font-size="1.55">A5 SCL ~</text><line x1="0" y1="20.32" x2="27" y2="20.32" stroke="#000" stroke-width="0.1"/><text x="4.3" y="22.14" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">18</text><text x="9" y="22.1" text-anchor="start" font-size="1.55">A4 SDA ~</text><line x1="0" y1="22.86" x2="27" y2="22.86" stroke="#000" stroke-width="0.1"/><text x="4.3" y="24.68" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">17</text><text x="9" y="24.64" text-anchor="start" font-size="1.55">A3 TX4 SDA1</text><line x1="0" y1="25.4" x2="27" y2="25.4" stroke="#000" stroke-width="0.1"/><text x="4.3" y="27.22" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">16</text><text x="9" y="27.18" text-anchor="start" font-size="1.55">A2 RX4 SCL1</text><line x1="0" y1="27.94" x2="27" y2="27.94" stroke="#000" stroke-width="0.1"/><text x="4.3" y="29.76" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">15</text><text x="9" y="29.720000000000002" text-anchor="start" font-size="1.55">A1 RX3 ~</text><line x1="0" y1="30.48" x2="27" y2="30.48" stroke="#000" stroke-width="0.1"/><text x="4.3" y="32.3" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">14</text><text x="9" y="32.26" text-anchor="start" font-size="1.55">A0 TX3 ~</text><line x1="0" y1="33.02" x2="27" y2="33.02" stroke="#000" stroke-width="0.1"/><text x="4.3" y="34.84" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">13</text><text x="9" y="34.800000000000004" text-anchor="start" font-size="1.55">LED SCK ~</text><line x1="0" y1="35.56" x2="27" y2="35.56" stroke="#000" stroke-width="0.1"/><rect x="0.4" y="35.910000000000004" width="7.8" height="1.84" fill="#000"/><text x="4.3" y="37.38" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#fff">GND</text><text x="9" y="37.34" text-anchor="start" font-size="1.55"></text><line x1="0" y1="38.1" x2="27" y2="38.1" stroke="#000" stroke-width="0.1"/><text x="4.3" y="39.92" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">41</text><text x="9" y="39.88" text-anchor="start" font-size="1.55">A17</text><line x1="0" y1="40.64" x2="27" y2="40.64" stroke="#000" stroke-width="0.1"/><text x="4.3" y="42.46" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">40</text><text x="9" y="42.42" text-anchor="start" font-size="1.55">A16</text><line x1="0" y1="43.18" x2="27" y2="43.18" stroke="#000" stroke-width="0.1"/><text x="4.3" y="45" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">39</text><text x="9" y="44.96" text-anchor="start" font-size="1.55">A15 MISO1</text><line x1="0" y1="45.72" x2="27" y2="45.72" stroke="#000" stroke-width="0.1"/><text x="4.3" y="47.54" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">38</text><text x="9" y="47.5" text-anchor="start" font-size="1.55">A14 CS1</text><line x1="0" y1="48.26" x2="27" y2="48.26" stroke="#000" stroke-width="0.1"/><text x="4.3" y="50.08" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">37</text><text x="9" y="50.04" text-anchor="start" font-size="1.55">CS ~</text><line x1="0" y1="50.8" x2="27" y2="50.8" stroke="#000" stroke-width="0.1"/><text x="4.3" y="52.62" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">36</text><text x="9" y="52.58" text-anchor="start" font-size="1.55">CS ~</text><line x1="0" y1="53.34" x2="27" y2="53.34" stroke="#000" stroke-width="0.1"/><text x="4.3" y="55.160000000000004" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">35</text><text x="9" y="55.120000000000005" text-anchor="start" font-size="1.55">TX8</text><line x1="0" y1="55.88" x2="27" y2="55.88" stroke="#000" stroke-width="0.1"/><text x="4.3" y="57.7" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">34</text><text x="9" y="57.660000000000004" text-anchor="start" font-size="1.55">RX8</text><line x1="0" y1="58.42" x2="27" y2="58.42" stroke="#000" stroke-width="0.1"/><text x="4.3" y="60.24" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">33</text><text x="9" y="60.2" text-anchor="start" font-size="1.55">~</text></g><text x="100" y="28" font-size="2.6" font-weight="bold">Key</text>
+    <text x="100" y="33" font-size="2.3">~  PWM (analogWrite)</text>
+    <text x="100" y="37" font-size="2.3">A0–A17  analog inputs</text>
+    <text x="100" y="41" font-size="2.3">RXn / TXn  Serial1–8</text>
+    <text x="100" y="45" font-size="2.3">SDA / SCL  I2C (Wire, 1, 2)</text>
+    <text x="100" y="49" font-size="2.3">MOSI MISO SCK CS  SPI</text>
+    <text x="100" y="53" font-size="2.3">CRXn / CTXn  CAN1–3</text>
+    <text x="100" y="57" font-size="2.3">MQSL / MQSR  audio out</text>
+    <text x="100" y="64" font-size="2.3">Every pin: 3.3 V only,</text>
+    <text x="100" y="68" font-size="2.3">4 mA, interrupts.</text>
+    <text x="100" y="75" font-size="2.3">Inner pads by the SD socket:</text>
+    <text x="100" y="79" font-size="2.3">VBAT, 3.3V, GND, Program,</text>
+    <text x="100" y="83" font-size="2.3">On/Off (check the order on</text>
+    <text x="100" y="87" font-size="2.3">your board before soldering).</text>
+    <text x="8" y="102.96000000000001" font-size="3.2" font-weight="bold">B. USB to the left (breadboard view, Lessons 1 and 7)</text>
+    <text x="8" y="106.96000000000001" font-size="2.3">Top strip above the board, bottom strip below it.</text>
+    <g transform="translate(8,135.96) rotate(-90)"><rect x="0" y="0" width="27" height="60.96" fill="#fff" stroke="#000" stroke-width="0.25"/><rect x="0.4" y="0.35" width="7.8" height="1.84" fill="#000"/><text x="4.3" y="1.82" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#fff">VIN</text><text x="9" y="1.78" text-anchor="start" font-size="1.55">3.6–5.5 V</text><line x1="0" y1="2.54" x2="27" y2="2.54" stroke="#000" stroke-width="0.1"/><rect x="0.4" y="2.89" width="7.8" height="1.84" fill="#000"/><text x="4.3" y="4.36" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#fff">GND</text><text x="9" y="4.32" text-anchor="start" font-size="1.55"></text><line x1="0" y1="5.08" x2="27" y2="5.08" stroke="#000" stroke-width="0.1"/><rect x="0.4" y="5.43" width="7.8" height="1.84" fill="#000"/><text x="4.3" y="6.9" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#fff">3.3V</text><text x="9" y="6.86" text-anchor="start" font-size="1.55">250 mA</text><line x1="0" y1="7.62" x2="27" y2="7.62" stroke="#000" stroke-width="0.1"/><text x="4.3" y="9.44" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">23</text><text x="9" y="9.4" text-anchor="start" font-size="1.55">A9 CRX1 ~</text><line x1="0" y1="10.16" x2="27" y2="10.16" stroke="#000" stroke-width="0.1"/><text x="4.3" y="11.98" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">22</text><text x="9" y="11.94" text-anchor="start" font-size="1.55">A8 CTX1 ~</text><line x1="0" y1="12.7" x2="27" y2="12.7" stroke="#000" stroke-width="0.1"/><text x="4.3" y="14.52" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">21</text><text x="9" y="14.479999999999999" text-anchor="start" font-size="1.55">A7 RX5</text><line x1="0" y1="15.24" x2="27" y2="15.24" stroke="#000" stroke-width="0.1"/><text x="4.3" y="17.06" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">20</text><text x="9" y="17.02" text-anchor="start" font-size="1.55">A6 TX5</text><line x1="0" y1="17.78" x2="27" y2="17.78" stroke="#000" stroke-width="0.1"/><text x="4.3" y="19.6" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">19</text><text x="9" y="19.560000000000002" text-anchor="start" font-size="1.55">A5 SCL ~</text><line x1="0" y1="20.32" x2="27" y2="20.32" stroke="#000" stroke-width="0.1"/><text x="4.3" y="22.14" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">18</text><text x="9" y="22.1" text-anchor="start" font-size="1.55">A4 SDA ~</text><line x1="0" y1="22.86" x2="27" y2="22.86" stroke="#000" stroke-width="0.1"/><text x="4.3" y="24.68" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">17</text><text x="9" y="24.64" text-anchor="start" font-size="1.55">A3 TX4 SDA1</text><line x1="0" y1="25.4" x2="27" y2="25.4" stroke="#000" stroke-width="0.1"/><text x="4.3" y="27.22" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">16</text><text x="9" y="27.18" text-anchor="start" font-size="1.55">A2 RX4 SCL1</text><line x1="0" y1="27.94" x2="27" y2="27.94" stroke="#000" stroke-width="0.1"/><text x="4.3" y="29.76" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">15</text><text x="9" y="29.720000000000002" text-anchor="start" font-size="1.55">A1 RX3 ~</text><line x1="0" y1="30.48" x2="27" y2="30.48" stroke="#000" stroke-width="0.1"/><text x="4.3" y="32.3" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">14</text><text x="9" y="32.26" text-anchor="start" font-size="1.55">A0 TX3 ~</text><line x1="0" y1="33.02" x2="27" y2="33.02" stroke="#000" stroke-width="0.1"/><text x="4.3" y="34.84" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">13</text><text x="9" y="34.800000000000004" text-anchor="start" font-size="1.55">LED SCK ~</text><line x1="0" y1="35.56" x2="27" y2="35.56" stroke="#000" stroke-width="0.1"/><rect x="0.4" y="35.910000000000004" width="7.8" height="1.84" fill="#000"/><text x="4.3" y="37.38" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#fff">GND</text><text x="9" y="37.34" text-anchor="start" font-size="1.55"></text><line x1="0" y1="38.1" x2="27" y2="38.1" stroke="#000" stroke-width="0.1"/><text x="4.3" y="39.92" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">41</text><text x="9" y="39.88" text-anchor="start" font-size="1.55">A17</text><line x1="0" y1="40.64" x2="27" y2="40.64" stroke="#000" stroke-width="0.1"/><text x="4.3" y="42.46" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">40</text><text x="9" y="42.42" text-anchor="start" font-size="1.55">A16</text><line x1="0" y1="43.18" x2="27" y2="43.18" stroke="#000" stroke-width="0.1"/><text x="4.3" y="45" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">39</text><text x="9" y="44.96" text-anchor="start" font-size="1.55">A15 MISO1</text><line x1="0" y1="45.72" x2="27" y2="45.72" stroke="#000" stroke-width="0.1"/><text x="4.3" y="47.54" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">38</text><text x="9" y="47.5" text-anchor="start" font-size="1.55">A14 CS1</text><line x1="0" y1="48.26" x2="27" y2="48.26" stroke="#000" stroke-width="0.1"/><text x="4.3" y="50.08" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">37</text><text x="9" y="50.04" text-anchor="start" font-size="1.55">CS ~</text><line x1="0" y1="50.8" x2="27" y2="50.8" stroke="#000" stroke-width="0.1"/><text x="4.3" y="52.62" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">36</text><text x="9" y="52.58" text-anchor="start" font-size="1.55">CS ~</text><line x1="0" y1="53.34" x2="27" y2="53.34" stroke="#000" stroke-width="0.1"/><text x="4.3" y="55.160000000000004" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">35</text><text x="9" y="55.120000000000005" text-anchor="start" font-size="1.55">TX8</text><line x1="0" y1="55.88" x2="27" y2="55.88" stroke="#000" stroke-width="0.1"/><text x="4.3" y="57.7" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">34</text><text x="9" y="57.660000000000004" text-anchor="start" font-size="1.55">RX8</text><line x1="0" y1="58.42" x2="27" y2="58.42" stroke="#000" stroke-width="0.1"/><text x="4.3" y="60.24" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">33</text><text x="9" y="60.2" text-anchor="start" font-size="1.55">~</text></g>
+    <rect x="8" y="137.46" width="60.96" height="17.78" rx="1" fill="none" stroke="#000" stroke-width="0.2" stroke-dasharray="1 0.8"/>
+    <text x="38.480000000000004" y="147.15000000000003" text-anchor="middle" font-size="2.2">Teensy 4.1, USB to the left</text>
+    <g transform="translate(8,183.74) rotate(-90)"><rect x="0" y="0" width="27" height="60.96" fill="#fff" stroke="#000" stroke-width="0.25"/><rect x="18.8" y="0.35" width="7.8" height="1.84" fill="#000"/><text x="22.7" y="1.82" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#fff">GND</text><text x="18" y="1.78" text-anchor="end" font-size="1.55"></text><line x1="0" y1="2.54" x2="27" y2="2.54" stroke="#000" stroke-width="0.1"/><text x="22.7" y="4.36" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">0</text><text x="18" y="4.32" text-anchor="end" font-size="1.55">RX1 CRX2 CS1 ~</text><line x1="0" y1="5.08" x2="27" y2="5.08" stroke="#000" stroke-width="0.1"/><text x="22.7" y="6.9" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">1</text><text x="18" y="6.86" text-anchor="end" font-size="1.55">TX1 CTX2 MISO1 ~</text><line x1="0" y1="7.62" x2="27" y2="7.62" stroke="#000" stroke-width="0.1"/><text x="22.7" y="9.44" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">2</text><text x="18" y="9.4" text-anchor="end" font-size="1.55">~</text><line x1="0" y1="10.16" x2="27" y2="10.16" stroke="#000" stroke-width="0.1"/><text x="22.7" y="11.98" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">3</text><text x="18" y="11.94" text-anchor="end" font-size="1.55">~</text><line x1="0" y1="12.7" x2="27" y2="12.7" stroke="#000" stroke-width="0.1"/><text x="22.7" y="14.52" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">4</text><text x="18" y="14.479999999999999" text-anchor="end" font-size="1.55">~</text><line x1="0" y1="15.24" x2="27" y2="15.24" stroke="#000" stroke-width="0.1"/><text x="22.7" y="17.06" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">5</text><text x="18" y="17.02" text-anchor="end" font-size="1.55">~</text><line x1="0" y1="17.78" x2="27" y2="17.78" stroke="#000" stroke-width="0.1"/><text x="22.7" y="19.6" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">6</text><text x="18" y="19.560000000000002" text-anchor="end" font-size="1.55">~</text><line x1="0" y1="20.32" x2="27" y2="20.32" stroke="#000" stroke-width="0.1"/><text x="22.7" y="22.14" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">7</text><text x="18" y="22.1" text-anchor="end" font-size="1.55">RX2 ~</text><line x1="0" y1="22.86" x2="27" y2="22.86" stroke="#000" stroke-width="0.1"/><text x="22.7" y="24.68" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">8</text><text x="18" y="24.64" text-anchor="end" font-size="1.55">TX2 ~</text><line x1="0" y1="25.4" x2="27" y2="25.4" stroke="#000" stroke-width="0.1"/><text x="22.7" y="27.22" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">9</text><text x="18" y="27.18" text-anchor="end" font-size="1.55">~</text><line x1="0" y1="27.94" x2="27" y2="27.94" stroke="#000" stroke-width="0.1"/><text x="22.7" y="29.76" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">10</text><text x="18" y="29.720000000000002" text-anchor="end" font-size="1.55">MQSR CS ~</text><line x1="0" y1="30.48" x2="27" y2="30.48" stroke="#000" stroke-width="0.1"/><text x="22.7" y="32.3" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">11</text><text x="18" y="32.26" text-anchor="end" font-size="1.55">MOSI ~</text><line x1="0" y1="33.02" x2="27" y2="33.02" stroke="#000" stroke-width="0.1"/><text x="22.7" y="34.84" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">12</text><text x="18" y="34.800000000000004" text-anchor="end" font-size="1.55">MQSL MISO ~</text><line x1="0" y1="35.56" x2="27" y2="35.56" stroke="#000" stroke-width="0.1"/><rect x="18.8" y="35.910000000000004" width="7.8" height="1.84" fill="#000"/><text x="22.7" y="37.38" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#fff">3.3V</text><text x="18" y="37.34" text-anchor="end" font-size="1.55">out</text><line x1="0" y1="38.1" x2="27" y2="38.1" stroke="#000" stroke-width="0.1"/><text x="22.7" y="39.92" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">24</text><text x="18" y="39.88" text-anchor="end" font-size="1.55">A10 TX6 SCL2 ~</text><line x1="0" y1="40.64" x2="27" y2="40.64" stroke="#000" stroke-width="0.1"/><text x="22.7" y="42.46" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">25</text><text x="18" y="42.42" text-anchor="end" font-size="1.55">A11 RX6 SDA2 ~</text><line x1="0" y1="43.18" x2="27" y2="43.18" stroke="#000" stroke-width="0.1"/><text x="22.7" y="45" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">26</text><text x="18" y="44.96" text-anchor="end" font-size="1.55">A12 MOSI1</text><line x1="0" y1="45.72" x2="27" y2="45.72" stroke="#000" stroke-width="0.1"/><text x="22.7" y="47.54" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">27</text><text x="18" y="47.5" text-anchor="end" font-size="1.55">A13 SCK1</text><line x1="0" y1="48.26" x2="27" y2="48.26" stroke="#000" stroke-width="0.1"/><text x="22.7" y="50.08" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">28</text><text x="18" y="50.04" text-anchor="end" font-size="1.55">RX7 ~</text><line x1="0" y1="50.8" x2="27" y2="50.8" stroke="#000" stroke-width="0.1"/><text x="22.7" y="52.62" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">29</text><text x="18" y="52.58" text-anchor="end" font-size="1.55">TX7 ~</text><line x1="0" y1="53.34" x2="27" y2="53.34" stroke="#000" stroke-width="0.1"/><text x="22.7" y="55.160000000000004" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">30</text><text x="18" y="55.120000000000005" text-anchor="end" font-size="1.55">CRX3</text><line x1="0" y1="55.88" x2="27" y2="55.88" stroke="#000" stroke-width="0.1"/><text x="22.7" y="57.7" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">31</text><text x="18" y="57.660000000000004" text-anchor="end" font-size="1.55">CTX3</text><line x1="0" y1="58.42" x2="27" y2="58.42" stroke="#000" stroke-width="0.1"/><text x="22.7" y="60.24" text-anchor="middle" font-size="1.75" font-weight="bold" fill="#000">32</text><text x="18" y="60.2" text-anchor="end" font-size="1.55"></text></g><g transform="translate(8,194.74)"><rect x="0" y="0" width="50" height="4" fill="none" stroke="#000" stroke-width="0.25"/><line x1="0" y1="0" x2="0" y2="4" stroke="#000" stroke-width="0.25"/><line x1="1" y1="0" x2="1" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="2" y1="0" x2="2" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="3" y1="0" x2="3" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="4" y1="0" x2="4" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="5" y1="0" x2="5" y2="2.8" stroke="#000" stroke-width="0.12"/><line x1="6" y1="0" x2="6" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="7" y1="0" x2="7" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="8" y1="0" x2="8" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="9" y1="0" x2="9" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="10" y1="0" x2="10" y2="4" stroke="#000" stroke-width="0.25"/><line x1="11" y1="0" x2="11" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="12" y1="0" x2="12" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="13" y1="0" x2="13" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="14" y1="0" x2="14" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="15" y1="0" x2="15" y2="2.8" stroke="#000" stroke-width="0.12"/><line x1="16" y1="0" x2="16" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="17" y1="0" x2="17" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="18" y1="0" x2="18" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="19" y1="0" x2="19" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="20" y1="0" x2="20" y2="4" stroke="#000" stroke-width="0.25"/><line x1="21" y1="0" x2="21" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="22" y1="0" x2="22" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="23" y1="0" x2="23" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="24" y1="0" x2="24" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="25" y1="0" x2="25" y2="2.8" stroke="#000" stroke-width="0.12"/><line x1="26" y1="0" x2="26" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="27" y1="0" x2="27" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="28" y1="0" x2="28" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="29" y1="0" x2="29" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="30" y1="0" x2="30" y2="4" stroke="#000" stroke-width="0.25"/><line x1="31" y1="0" x2="31" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="32" y1="0" x2="32" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="33" y1="0" x2="33" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="34" y1="0" x2="34" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="35" y1="0" x2="35" y2="2.8" stroke="#000" stroke-width="0.12"/><line x1="36" y1="0" x2="36" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="37" y1="0" x2="37" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="38" y1="0" x2="38" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="39" y1="0" x2="39" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="40" y1="0" x2="40" y2="4" stroke="#000" stroke-width="0.25"/><line x1="41" y1="0" x2="41" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="42" y1="0" x2="42" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="43" y1="0" x2="43" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="44" y1="0" x2="44" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="45" y1="0" x2="45" y2="2.8" stroke="#000" stroke-width="0.12"/><line x1="46" y1="0" x2="46" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="47" y1="0" x2="47" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="48" y1="0" x2="48" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="49" y1="0" x2="49" y2="1.6" stroke="#000" stroke-width="0.12"/><line x1="50" y1="0" x2="50" y2="4" stroke="#000" stroke-width="0.25"/><text x="0" y="7.2" text-anchor="middle" font-size="2.2">0</text><text x="10" y="7.2" text-anchor="middle" font-size="2.2">10</text><text x="20" y="7.2" text-anchor="middle" font-size="2.2">20</text><text x="30" y="7.2" text-anchor="middle" font-size="2.2">30</text><text x="40" y="7.2" text-anchor="middle" font-size="2.2">40</text><text x="50" y="7.2" text-anchor="middle" font-size="2.2">50</text><text x="54" y="3.4" font-size="2.6">mm: must measure exactly 50 mm.</text></g></svg></div>
+</section>
+<section class="worksheet" id="worksheet-pin-planner"><h2>Worksheet 2: pin planner</h2>
+<p>Plan every project on paper before wiring: one row per pin you use. Check each pin's jobs on Card A or the strips, keep pins 10 and 12 free if you want MQS audio, and tick <b>Checked</b> once the wire is in and beeps through with the meter.</p>
+<div class="fields"><span>Project</span><span>Date</span><span>USB Type</span><span>CPU speed</span></div>
+<table class="planner"><thead><tr><th>Pin</th><th>Job (A0, PWM, RX2, SDA…)</th><th>Connected to</th><th>Wire colour</th><th>Checked</th></tr></thead><tbody>
+<tr><td>GND</td><td>ground</td><td></td><td>black</td><td></td></tr><tr><td>3.3V</td><td>power out, 250 mA max</td><td></td><td>red</td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table>
+</section>
+</main></body></html>

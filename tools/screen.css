@@ -1,0 +1,67 @@
+/* Web page for every course (tools/build-course.mjs). The PDF is the version meant for paper. */
+:root { --ink: #111; --muted: #444; --line: #bbb; --tint: #f2f2f2; --accent: #000; --bg: #fff; }
+* { box-sizing: border-box; }
+html { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 17px; color: var(--ink); background: var(--bg); }
+body { margin: 0; line-height: 1.55; }
+main { max-width: 50rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+h1 { font-size: 2.2rem; line-height: 1.15; margin: 0.5rem 0 0.3rem; padding-bottom: 0.4rem; border-bottom: 5px solid var(--accent); }
+h2 { font-size: 1.6rem; line-height: 1.2; margin: 3.2rem 0 1rem; padding-bottom: 0.25rem; border-bottom: 3px solid var(--accent); }
+h3 { font-size: 1.15rem; margin: 2rem 0 0.6rem; padding-left: 0.5rem; border-left: 5px solid var(--accent); }
+.sub { color: var(--muted); }
+p { margin: 0 0 0.9rem; }
+
+.toc-head { font-size: 1.2rem; margin-top: 1.5rem; }
+.toc { columns: 2 18rem; column-gap: 2rem; }
+.toc-row { display: block; padding: 0.15rem 0; text-decoration: none; break-inside: avoid; }
+.toc-row:hover .toc-text { text-decoration: underline; }
+.toc-dots, .toc-page { display: none; }
+.howto { margin: 1.5rem 0; border: 2px solid var(--accent); padding: 0.7rem 1rem; }
+
+p.goal { border: 2px solid var(--accent); padding: 0.7rem 1rem; }
+p.label { font-size: 1.05rem; margin: 1.4rem 0 0.4rem; }
+
+ol { counter-reset: step; list-style: none; padding-left: 0; }
+ol > li { counter-increment: step; position: relative; padding-left: 2.3rem; margin: 0 0 0.55rem; min-height: 1.6rem; }
+ol > li::before { content: counter(step); position: absolute; left: 0; top: 0.05rem; width: 1.55rem; height: 1.55rem; background: var(--accent); color: #fff; font-weight: 700; font-size: 0.85rem; line-height: 1.55rem; text-align: center; border-radius: 4px; }
+ul { padding-left: 1.4rem; }
+ul > li { margin-bottom: 0.3rem; }
+ul.tasks { list-style: none; padding-left: 0; }
+ul.tasks > li { position: relative; padding-left: 1.9rem; }
+.box { position: absolute; left: 0; top: 0.2rem; width: 1.15rem; height: 1.15rem; border: 2px solid var(--accent); border-radius: 2px; }
+
+.table-wrap { overflow-x: auto; margin: 0.5rem 0 1.2rem; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; line-height: 1.4; }
+th, td { border: 1px solid var(--line); padding: 0.4rem 0.55rem; vertical-align: top; text-align: left; }
+th { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+figure { margin: 1.4rem 0; }
+figure img, figure svg { display: block; width: 100%; height: auto; }
+figcaption { font-size: 0.88rem; color: var(--muted); margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid var(--line); }
+.cover-fig img { max-width: 40rem; }
+
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.86em; }
+p code, li code, td code { background: var(--tint); padding: 0.05rem 0.25rem; border-radius: 3px; }
+.code { border: 1px solid var(--line); border-left: 5px solid var(--accent); margin: 0.8rem 0 1.2rem; background: #fafafa; }
+.code-label { background: var(--accent); color: #fff; font: 700 0.75rem ui-monospace, Menlo, monospace; padding: 0.2rem 0.6rem; }
+.code pre { margin: 0; padding: 0.7rem 0.9rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.45; }
+
+.callout { border: 2px solid var(--accent); padding: 0.7rem 1rem 0.2rem 3rem; margin: 1rem 0 1.3rem; position: relative; }
+.callout::before { position: absolute; left: 0.8rem; top: 0.75rem; width: 1.4rem; height: 1.4rem; line-height: 1.25rem; text-align: center; font-weight: 700; border: 2px solid var(--accent); border-radius: 50%; }
+.callout.warn { border-width: 3px; }
+.callout.warn::before { content: "!"; background: var(--accent); color: #fff; }
+.callout.tip::before { content: "→"; }
+.callout.note::before { content: "i"; font-family: Georgia, serif; }
+
+.card { position: relative; border: 2px dashed var(--accent); padding: 1rem 1.2rem 0.4rem; margin: 1.6rem 0; }
+.card .cut { position: absolute; top: -0.7rem; left: 1rem; background: var(--bg); padding: 0 0.4rem; font-size: 0.75rem; }
+.card h3 { margin-top: 0.3rem; }
+.card.wall ul.tasks > li { font-size: 1.25rem; font-weight: 700; }
+
+/* Worksheets are drawn for paper; on screen they just need to fit */
+.worksheet svg { max-width: 100%; height: auto; }
+.fields { display: flex; gap: 1rem; margin: 0.5rem 0 1rem; flex-wrap: wrap; }
+.fields span { flex: 1; min-width: 8rem; border-bottom: 1px solid var(--accent); padding-top: 1.2rem; font-size: 0.8rem; }
+
+@media (max-width: 600px) { html { font-size: 16px; } h1 { font-size: 1.8rem; } }
+@media print { main { max-width: none; padding: 0; } h2 { break-before: page; } figure, .code, .callout, .card, tr { break-inside: avoid; } }
