@@ -11,8 +11,13 @@ Print-first, hands-on electrical engineering courses. Each tutorial folder holds
 | `teensy41/` | Teensy 4.1 Hands-On (Teensyduino) | `teensy41-course` |
 | `oscilloscope/` | Oscilloscope buying guide and measurement map | `oscilloscope-guide` |
 | `sds804x-hd/` | Oscilloscope Hands-On for the Siglent SDS804X HD | `sds804x-hd-course` |
+| `dynamixel/` | DYNAMIXEL Hands-On (X-series servos, U2D2, Python SDK) | `dynamixel-course` |
+| `xiao-interlock/` | Safe Actuator Control: interlock and fire controller on the XIAO RP2040 | `xiao-interlock-course` |
+| `power-usb/` | Power and USB for Multi-Board Builds | `power-usb-course` |
 
 The user owns a Siglent SDS804X HD, an ESP32-DevKitC V4 and a Teensy 4.1, and works on a Mac.
+
+The user is building **REASON**: towers with DYNAMIXEL servos, CH334F USB hubs fed by Pololu D36V28F5 bucks, a XIAO RP2040 fire controller behind a key/E-stop relay interlock, MOSFET modules, a WS2812 ring and a 12 V supply. Soldering Lesson 6 lists the wires (W1 to W31); the `dynamixel/`, `xiao-interlock/` and `power-usb/` courses build on it. REASON's own build page is the authority: courses state their assumptions (servo model, pin choices) instead of inventing details.
 
 ## Commands
 

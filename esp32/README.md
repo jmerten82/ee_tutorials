@@ -35,6 +35,7 @@ Work in sessions of 60 to 120 minutes. Debugging a circuit while tired is how wi
 - [Teensy 4.1 Hands-On](../teensy41/README.md) covers the same basics on a faster board, with no Wi-Fi but USB MIDI, audio, SD logging and CAN: [bounce](../teensy41/README.md#exercise-12-read-a-button-and-meet-bounce), [PWM](../teensy41/README.md#exercise-24-fade-an-led-with-pwm), a [12 V MOSFET switch](../teensy41/README.md#exercise-25-switch-12-v-with-a-mosfet) and [I2C](../teensy41/README.md#exercise-62-an-i2c-sensor-and-an-oled). Do the two courses in either order.
 - [Oscilloscope Hands-On](../sds804x-hd/README.md) is built on this course's circuits. The ESP32 becomes its test-signal generator, and the button, MOSFET driver, I2C sensor and Wi-Fi sketches return as measurement exercises. Look for **With a scope** tips in the lessons below.
 - The [oscilloscope buying guide](../oscilloscope/README.md) lists what a scope shows in each exercise of this course.
+- For REASON's towers: [DYNAMIXEL Hands-On](../dynamixel/README.md), [Safe Actuator Control](../xiao-interlock/README.md) (a XIAO RP2040 instead of the ESP32, same Arduino habits) and [Power and USB for Multi-Board Builds](../power-usb/README.md).
 
 ## The ESP32 in one page
 

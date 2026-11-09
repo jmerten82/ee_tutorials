@@ -35,6 +35,7 @@ Work in sessions of 60 to 120 minutes. The scope needs about 20 minutes to warm 
 - [Teensy 4.1 Hands-On](../teensy41/README.md): the fast pin edges of Lesson 5, the MQS audio of Lesson 4 and the CAN bus of Lesson 8.
 - [Hands-On Soldering](../soldering/README.md): the 555 blinker of Exercise 3.7 and the cable work for the current-sense lead in Lesson 6.
 - The [oscilloscope buying guide](../oscilloscope/README.md): why this scope, the alternatives, and a course-by-course list of what a scope shows in the other tutorials.
+- The REASON courses use this scope for real work: [Power and USB for Multi-Board Builds](../power-usb/README.md) (rails, ripple, load steps, stall current), [DYNAMIXEL Hands-On](../dynamixel/README.md) (decoding the servo bus) and [Safe Actuator Control](../xiao-interlock/README.md) (key-off to rail-off timing).
 
 ## What an oscilloscope does
 

@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Safe Actuator Control: Interlocks and a Fire Controller on the XIAO RP2040</title><style>/* Web page for every course (tools/build-course.mjs). The PDF is the version meant for paper. */
+:root { --ink: #111; --muted: #444; --line: #bbb; --tint: #f2f2f2; --accent: #000; --bg: #fff; }
+* { box-sizing: border-box; }
+html { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 17px; color: var(--ink); background: var(--bg); }
+body { margin: 0; line-height: 1.55; }
+main { max-width: 50rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+h1 { font-size: 2.2rem; line-height: 1.15; margin: 0.5rem 0 0.3rem; padding-bottom: 0.4rem; border-bottom: 5px solid var(--accent); }
+h2 { font-size: 1.6rem; line-height: 1.2; margin: 3.2rem 0 1rem; padding-bottom: 0.25rem; border-bottom: 3px solid var(--accent); }
+h3 { font-size: 1.15rem; margin: 2rem 0 0.6rem; padding-left: 0.5rem; border-left: 5px solid var(--accent); }
+.sub { color: var(--muted); }
+p { margin: 0 0 0.9rem; }
+
+.toc-head { font-size: 1.2rem; margin-top: 1.5rem; }
+.toc { columns: 2 18rem; column-gap: 2rem; }
+.toc-row { display: block; padding: 0.15rem 0; text-decoration: none; break-inside: avoid; }
+.toc-row:hover .toc-text { text-decoration: underline; }
+.toc-dots, .toc-page { display: none; }
+.howto { margin: 1.5rem 0; border: 2px solid var(--accent); padding: 0.7rem 1rem; }
+
+p.goal { border: 2px solid var(--accent); padding: 0.7rem 1rem; }
+p.label { font-size: 1.05rem; margin: 1.4rem 0 0.4rem; }
+
+ol { counter-reset: step; list-style: none; padding-left: 0; }
+ol > li { counter-increment: step; position: relative; padding-left: 2.3rem; margin: 0 0 0.55rem; min-height: 1.6rem; }
+ol > li::before { content: counter(step); position: absolute; left: 0; top: 0.05rem; width: 1.55rem; height: 1.55rem; background: var(--accent); color: #fff; font-weight: 700; font-size: 0.85rem; line-height: 1.55rem; text-align: center; border-radius: 4px; }
+ul { padding-left: 1.4rem; }
+ul > li { margin-bottom: 0.3rem; }
+ul.tasks { list-style: none; padding-left: 0; }
+ul.tasks > li { position: relative; padding-left: 1.9rem; }
+.box { position: absolute; left: 0; top: 0.2rem; width: 1.15rem; height: 1.15rem; border: 2px solid var(--accent); border-radius: 2px; }
+
+.table-wrap { overflow-x: auto; margin: 0.5rem 0 1.2rem; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; line-height: 1.4; }
+th, td { border: 1px solid var(--line); padding: 0.4rem 0.55rem; vertical-align: top; text-align: left; }
+th { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+figure { margin: 1.4rem 0; }
+figure img, figure svg { display: block; width: 100%; height: auto; }
+figcaption { font-size: 0.88rem; color: var(--muted); margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid var(--line); }
+.cover-fig img { max-width: 40rem; }
+
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.86em; }
+p code, li code, td code { background: var(--tint); padding: 0.05rem 0.25rem; border-radius: 3px; }
+.code { border: 1px solid var(--line); border-left: 5px solid var(--accent); margin: 0.8rem 0 1.2rem; background: #fafafa; }
+.code-label { background: var(--accent); color: #fff; font: 700 0.75rem ui-monospace, Menlo, monospace; padding: 0.2rem 0.6rem; }
+.code pre { margin: 0; padding: 0.7rem 0.9rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.45; }
+
+.callout { border: 2px solid var(--accent); padding: 0.7rem 1rem 0.2rem 3rem; margin: 1rem 0 1.3rem; position: relative; }
+.callout::before { position: absolute; left: 0.8rem; top: 0.75rem; width: 1.4rem; height: 1.4rem; line-height: 1.25rem; text-align: center; font-weight: 700; border: 2px solid var(--accent); border-radius: 50%; }
+.callout.warn { border-width: 3px; }
+.callout.warn::before { content: "!"; background: var(--accent); color: #fff; }
+.callout.tip::before { content: "→"; }
+.callout.note::before { content: "i"; font-family: Georgia, serif; }
+
+.card { position: relative; border: 2px dashed var(--accent); padding: 1rem 1.2rem 0.4rem; margin: 1.6rem 0; }
+.card .cut { position: absolute; top: -0.7rem; left: 1rem; background: var(--bg); padding: 0 0.4rem; font-size: 0.75rem; }
+.card h3 { margin-top: 0.3rem; }
+.card.wall ul.tasks > li { font-size: 1.25rem; font-weight: 700; }
+
+/* Worksheets are drawn for paper; on screen they just need to fit */
+.worksheet svg { max-width: 100%; height: auto; }
+.fields { display: flex; gap: 1rem; margin: 0.5rem 0 1rem; flex-wrap: wrap; }
+.fields span { flex: 1; min-width: 8rem; border-bottom: 1px solid var(--accent); padding-top: 1.2rem; font-size: 0.8rem; }
+
+@media (max-width: 600px) { html { font-size: 16px; } h1 { font-size: 1.8rem; } }
+@media print { main { max-width: none; padding: 0; } h2 { break-before: page; } figure, .code, .callout, .card, tr { break-inside: avoid; } }
+
+#worksheet-1-test-record + .table-wrap td { height: 9mm; }
+</style></head>
+<body class="html"><main>
+<section class="cover">
+  <h1>Safe Actuator Control: Interlocks and a Fire Controller on the XIAO RP2040</h1>
+  <p class="sub">A practical course on controlling a 12 V actuator safely: a hardware interlock first, fail-safe firmware second, written around REASON's tower 2 and a Seeed XIAO RP2040. Last updated 2026-11-07.</p>
+  <figure class="cover-fig"><img src="diagrams/01-system.svg" alt=""></figure>
+  <p><strong>Shopping list:</strong> see <a href="#everything-you-need-for-all-lessons">Everything you need for all lessons</a>.</p><p><strong>Printable version:</strong> print <a href="xiao-interlock-course.pdf"><code>xiao-interlock-course.pdf</code></a>. It has the whole course, high-contrast drawings, cut-out reference cards, a test record and a practice log. You can also read <a href="xiao-interlock-course.html"><code>xiao-interlock-course.html</code></a> in a browser. The drawings live in <a href="diagrams/"><code>diagrams/</code></a> as SVG, with high-contrast print versions in <a href="diagrams/print/"><code>diagrams/print/</code></a>; their sources are in <a href="diagrams/src/"><code>diagrams/src/</code></a>. From the repository root, <code>node tools/render-diagrams.mjs xiao-interlock</code> rebuilds the drawings and then <code>node tools/build-course.mjs xiao-interlock</code> rebuilds both the HTML and the PDF.</p>
+  <h2 class="toc-head">Contents</h2>
+  <nav class="toc"><a class="toc-row" href="#how-to-use-this-course"><span class="toc-text">How to use this course</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#safety-design"><span class="toc-text">Safety design</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#the-xiao-rp2040-in-one-page"><span class="toc-text">The XIAO RP2040 in one page</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#everything-you-need-for-all-lessons"><span class="toc-text">Everything you need for all lessons</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-0-meet-the-xiao-rp2040"><span class="toc-text">Lesson 0: Meet the XIAO RP2040</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-1-reading-the-interlock"><span class="toc-text">Lesson 1: Reading the interlock</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-2-a-fail-safe-output"><span class="toc-text">Lesson 2: A fail-safe output</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-3-the-state-machine"><span class="toc-text">Lesson 3: The state machine</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-4-talking-to-the-mac"><span class="toc-text">Lesson 4: Talking to the Mac</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-5-the-watchdog"><span class="toc-text">Lesson 5: The watchdog</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-6-the-status-ring"><span class="toc-text">Lesson 6: The status ring</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-7-testing-like-you-mean-it"><span class="toc-text">Lesson 7: Testing like you mean it</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#lesson-8-capstone-the-tower-2-controller"><span class="toc-text">Lesson 8: Capstone: the tower 2 controller</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#troubleshooting"><span class="toc-text">Troubleshooting</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#reference-cards-and-practice-log"><span class="toc-text">Reference cards and practice log</span><span class="toc-dots"></span><span class="toc-page"></span></a><a class="toc-row" href="#sources"><span class="toc-text">Sources</span><span class="toc-dots"></span><span class="toc-page"></span></a></nav>
+  
+</section>
+<section class="chapter" id="how-to-use-this-course"><h2>How to use this course</h2><p>Nine sessions, about 19 hours in total, take you from a bare XIAO RP2040 to a tested controller for REASON's tower 2: it reads the key-and-E-stop interlock, drives the 12 V fire output through a MOSFET module, talks to the Mac over USB, shows its state on a WS2812 ring, and resets itself if it ever hangs. Every lesson has a goal, the parts you need, numbered exercises and a pass criterion. Do not move on until you pass.</p><p>The course rests on one rule, and every lesson comes back to it:</p><p><strong>The hardware interlock is the safety system. The firmware is a second layer that can only refuse.</strong> With the key off or the E-stop pressed, the relay is open and the fire rail is dead, whatever the XIAO, the Mac or a bug does. The firmware's job is to never fire when it should not, to keep every pulse short, and to fall back to safe when anything is wrong. It must never be the only thing between a command and the actuator.</p><p><strong>The actuator.</strong> This course calls the 12 V device on the fire rail "the actuator" (a solenoid or similar) and uses a dummy load for almost every exercise. The real actuator is connected once, in the capstone, after the whole test record has passed.</p><p><strong>Code.</strong> Every sketch is complete. Pins are written as RP2040 GPIO numbers, with the XIAO label in a comment, so the sketches compile whatever pin names your board package defines.</p><div class="table-wrap"><table><thead><tr><th>Lesson</th><th>Skill</th><th>Bench time</th><th>Pass criterion</th></tr></thead><tbody><tr><td>0</td><td>Meet the XIAO RP2040: toolchain, pins, 3.3 V rules</td><td>1.5 h</td><td>The onboard RGB LED changes colour on command from the Serial Monitor</td></tr><tr><td>1</td><td>Reading the interlock: ARM and CHAIN</td><td>2 h</td><td>The XIAO reports key, E-stop and rail correctly in all four combinations, and flags the impossible ones</td></tr><tr><td>2</td><td>A fail-safe output</td><td>2 h</td><td>The fire output stays off through power-up, reset and a firmware upload, checked on the scope</td></tr><tr><td>3</td><td>The state machine</td><td>2.5 h</td><td>SAFE, ARMED, FIRING and FAULT behave as the transition table says, pulse length bounded</td></tr><tr><td>4</td><td>Talking to the Mac</td><td>2.5 h</td><td>The Python host fires a pulse; stopping the heartbeat drops the controller to SAFE within 1 s</td></tr><tr><td>5</td><td>The watchdog</td><td>1.5 h</td><td>A deliberate hang reboots the XIAO within 0.5 s with the output off, and the boot reason is reported</td></tr><tr><td>6</td><td>The status ring</td><td>1.5 h</td><td>The ring shows every state, with clean data through the 74AHCT125</td></tr><tr><td>7</td><td>Testing like you mean it</td><td>2.5 h</td><td>Every row of the test matrix passes, with scope timings recorded</td></tr><tr><td>8</td><td>Capstone: the tower 2 controller</td><td>3 h</td><td>The signed test record is complete and the real actuator fires only when it should</td></tr></tbody></table></div><p>Work in sessions of 60 to 120 minutes, and never alone with 12 V and a moving actuator when you are tired.</p><h3 id="related-courses">Related courses</h3><ul><li><a href="../soldering/soldering-course.html">Hands-On Soldering</a>: <a href="../soldering/soldering-course.html#exercise-65-the-interlock-board-rehearsal-for-w23-w24-w26-w31">Exercise 6.5, the interlock board</a>, is the circuit this course reads and tests. Build and pass it first.</li><li><a href="../esp32/esp32-course.html">ESP32 Hands-On</a> and <a href="../teensy41/teensy41-course.html">Teensy 4.1 Hands-On</a>: digital inputs, debouncing, PWM and the <a href="../esp32/esp32-course.html#the-low-side-switch">low-side MOSFET switch</a> are taught there in more depth.</li><li><a href="../sds804x-hd/sds804x-hd-course.html">Oscilloscope Hands-On</a>: Lessons 2 and 7 here measure the output and the interlock timing with the SDS804X HD.</li><li><a href="../dynamixel/dynamixel-course.html">DYNAMIXEL servos</a> and <a href="../power-usb/power-usb-course.html">Power and USB</a>: the other parts of the REASON towers, written alongside this course.</li></ul></section>
+<section class="chapter" id="safety-design"><h2>Safety design</h2><p>Before any code: what protects you, what does not, and why the order matters.</p><figure><img src="diagrams/02-layers.svg" alt="Three layers of protection"><figcaption>REASON's tower 2 has three layers:</figcaption></figure><ol><li><strong>The hardware interlock.</strong> 12 V reaches the relay coil only through the normally closed E-stop and the key. Only the energised relay connects the fire rail. The actuator's plus side sits on the fire rail, so with the key off there is no energy to fire with. Nothing in software can change this.</li><li><strong>The controller firmware.</strong> It fires only when both interlock inputs agree, only for a bounded time, only with a live host, and never again within the re-arm time. It latches a fault when the inputs disagree, and the watchdog resets it if it hangs.</li><li><strong>The host software on the Mac.</strong> It decides when to ask for a pulse. It is the least trustworthy layer: it can crash, lose the USB link or send nonsense. The firmware treats it accordingly.</li></ol><figure><img src="diagrams/01-system.svg" alt="Tower 2: the interlock and the controller"></figure><h3 id="what-the-interlock-guarantees-and-what-it-does-not">What the interlock guarantees, and what it does not</h3><div class="table-wrap"><table><thead><tr><th>Part</th><th>Guarantees</th><th>Does not guarantee</th></tr></thead><tbody><tr><td>E-stop (normally closed)</td><td>Pressing it opens the coil circuit and drops the relay</td><td>Anything if its contact welds closed; test it at the start of every session</td></tr><tr><td>Key switch</td><td>No rail without the key</td><td>Anything if someone leaves the key in</td></tr><tr><td>Relay</td><td>The rail is disconnected while the coil is off</td><td>A welded contact keeps the rail live with the key off. The firmware detects this (ARM without CHAIN) but cannot cut the power: only the rocker switch or the supply can</td></tr><tr><td>Flyback diode</td><td>The coil's switch-off spike is clamped</td><td>Fast release: the diode slows the relay's release a little (Lesson 7 measures it)</td></tr><tr><td>Fuse</td><td>A short on the rail cannot burn the wiring</td><td>Protection of the MOSFET or the actuator</td></tr><tr><td>MOSFET module</td><td>The actuator is off while its gate is low</td><td>Anything if the MOSFET fails short: the actuator then fires as soon as the rail goes live. The optional drain sense in Lesson 3 detects it</td></tr></tbody></table></div><h3 id="bench-rules">Bench rules</h3><ul><li><strong>Never defeat the interlock to test something.</strong> No jumper across the key, no clip across the E-stop, no "temporary" wire from 12 V to the rail. If a test needs the rail live, turn the key.</li><li><strong>Use a dummy load</strong> until the capstone: a 12 V bulb, or a 47 Ω, 5 W resistor (about 0.26 A at 12 V). Keep the real actuator disconnected.</li><li><strong>Use a current-limited supply</strong> for every 12 V test: start at 0.5 A and raise it only as far as the dummy load needs.</li><li><strong>Press the E-stop first</strong> whenever something surprises you. Then think.</li><li><strong>One ground.</strong> The 12 V minus, the XIAO's GND and the ring's GND must be joined, or the dividers and the MOSFET module have no reference.</li><li><strong>No 12 V on a GPIO.</strong> The XIAO's pins are 3.3 V only and not 5 V tolerant. Every 12 V signal goes through a divider, and every divider is measured before it is connected.</li></ul><h3 id="single-points-of-failure">Single points of failure</h3><p>A single point of failure is one part whose failure alone makes the system unsafe. Walk through them before you build, and again before the capstone:</p><ul><li>A welded relay contact: the rail stays live. The firmware latches FAULT and refuses to fire; you must switch off at the rocker.</li><li>A shorted MOSFET: the actuator fires when the rail goes live, that is, when the key turns. The firmware cannot prevent this. The drain-sense exercise detects it while the key is off, before it matters; and the first arming of every session is done with the actuator in a safe state.</li><li>A shorted top resistor in a divider: more than 3.3 V on a GPIO. With the 22 kΩ + 10 kΩ top, a short of one resistor still limits the current to under a milliampere, which the pin's protection diodes usually survive, but it is outside the RP2040's ratings. Measure every divider output before connecting it.</li><li>A firmware bug that sets the output high: harmless with the key off, because the rail is dead. This is the point of the interlock.</li></ul></section>
+<section class="chapter" id="the-xiao-rp2040-in-one-page"><h2>The XIAO RP2040 in one page</h2><p>The Seeed Studio XIAO RP2040 is a thumb-sized board with Raspberry Pi's RP2040 chip: two Arm Cortex-M0+ cores at up to 133 MHz, 264 KB of RAM and 2 MB of flash, a USB-C connector, an RGB LED and a single WS2812 pixel on the board, and 11 usable pins on two edges.</p><figure><img src="diagrams/03-xiao-pins.svg" alt="XIAO RP2040 pins as used in this course"></figure><div class="table-wrap"><table><thead><tr><th>XIAO label</th><th>GPIO</th><th>Other functions</th><th>Use in this course</th></tr></thead><tbody><tr><td>D0</td><td>26</td><td>A0</td><td>spare</td></tr><tr><td>D1</td><td>27</td><td>A1</td><td><strong>ARM</strong>: fire rail present, through a divider</td></tr><tr><td>D2</td><td>28</td><td>A2</td><td><strong>FIRE</strong>: gate of the MOSFET module</td></tr><tr><td>D3</td><td>29</td><td>A3</td><td>optional drain sense (Lesson 3)</td></tr><tr><td>D4, D5</td><td>6, 7</td><td>I2C SDA, SCL</td><td>spare</td></tr><tr><td>D6</td><td>0</td><td>UART TX</td><td>spare</td></tr><tr><td>D7</td><td>1</td><td>UART RX</td><td><strong>CHAIN</strong>: coil feed present, through a divider</td></tr><tr><td>D8, D9</td><td>2, 4</td><td>SPI SCK, MISO</td><td>spare</td></tr><tr><td>D10</td><td>3</td><td>SPI MOSI</td><td><strong>RING</strong>: WS2812 data, through the 74AHCT125</td></tr><tr><td>onboard</td><td>11, 12</td><td>NeoPixel power, NeoPixel data</td><td>Lesson 0</td></tr><tr><td>onboard</td><td>17, 16, 25</td><td>red, green, blue LED (on when LOW)</td><td>Lesson 0</td></tr></tbody></table></div><p>ARM on D1, CHAIN on D7 and the ring on D10 follow REASON's wiring. The fire output on D2 and the drain sense on D3 are this course's choice; if REASON's build page assigns other pins, change the constants at the top of each sketch.</p><p><strong>Electrical limits.</strong> The pins run at 3.3 V and are <strong>not</strong> 5 V tolerant. A pin reads HIGH above about 2 V and LOW below about 0.8 V. Keep the current per pin to a few milliamps: the pins in this course drive a gate input and a level shifter, nothing more. The board is powered from USB-C (or 5 V on its 5V pin, never both without a diode); its 3V3 pin can supply a small sensor, not the ring.</p></section>
+<section class="chapter" id="everything-you-need-for-all-lessons"><h2>Everything you need for all lessons</h2><p>Print this page and tick items off as they arrive. The numbers in brackets are the lessons that first use each item.</p><h3 id="tools-buy-once">Tools (buy once)</h3><ul class="tasks"><li class="task"><span class="box"></span>Seeed Studio XIAO RP2040, headers soldered as in <a href="../soldering/soldering-course.html#exercise-64-straight-headers-on-modules">soldering Exercise 6.4</a>, plus one spare (0)</li><li class="task"><span class="box"></span>USB-C data cable for the Mac (0)</li><li class="task"><span class="box"></span>Breadboard and jumper wires (0)</li><li class="task"><span class="box"></span>Multimeter (1)</li><li class="task"><span class="box"></span>Bench power supply, 12 V, with an adjustable current limit (1)</li><li class="task"><span class="box"></span>Oscilloscope; the course uses the Siglent SDS804X HD (2, 7)</li><li class="task"><span class="box"></span>Two switches to stand in for the key and the E-stop, if the interlock board from soldering Exercise 6.5 is not to hand (1)</li></ul><h3 id="parts">Parts</h3><ul class="tasks"><li class="task"><span class="box"></span>The rehearsal interlock board from <a href="../soldering/soldering-course.html#exercise-65-the-interlock-board-rehearsal-for-w23-w24-w26-w31">soldering Exercise 6.5</a>: G5LE relay with 1N4007, key and E-stop stand-ins, both dividers (1)</li><li class="task"><span class="box"></span>Resistors: 22 kΩ ×2, 10 kΩ ×6, 330 Ω ×2, 1 kΩ ×2 (1, 2, 3, 6)</li><li class="task"><span class="box"></span>One MOSFET module of the kind REASON uses for W25, logic-level (fully on at 3.3 V gate drive) (2)</li><li class="task"><span class="box"></span>Dummy load: a 12 V, 5 W bulb, or a 47 Ω, 5 W wirewound resistor (2)</li><li class="task"><span class="box"></span>1N5819 or 1N4007 diode, as a flyback diode if your dummy load is a coil (2)</li><li class="task"><span class="box"></span>74AHCT125 in DIP-14 with a socket (6)</li><li class="task"><span class="box"></span>WS2812 ring (the REASON ring or a spare), and a 5 V supply for it: the REASON 5 V buck or a 5 V, 2 A adapter (6)</li><li class="task"><span class="box"></span>Electrolytic capacitor 1000 µF, 6.3 V or more (6)</li><li class="task"><span class="box"></span>The real actuator, for the capstone only (8)</li></ul><h3 id="software-free">Software (free)</h3><ul><li>Arduino IDE 2 with Earle Philhower's RP2040 core (Lesson 0).</li><li>The Adafruit NeoPixel library (Lessons 0 and 6).</li><li>Python 3 on the Mac with the <code>pyserial</code> package (Lesson 4).</li></ul></section>
+<section class="chapter" id="lesson-0-meet-the-xiao-rp2040"><h2>Lesson 0: Meet the XIAO RP2040</h2><p class="goal"><strong>Goal:</strong> a working toolchain and a board you can talk to. <strong>Time:</strong> 1.5 hours. <strong>Pass:</strong> the onboard RGB LED changes colour on command from the Serial Monitor, and you can name the four pins this course uses and what each is connected to.</p><h3 id="exercise-01-install-the-rp2040-core">Exercise 0.1: Install the RP2040 core</h3><p>There are two Arduino cores for the RP2040. This course uses Earle Philhower's <code>arduino-pico</code>, which supports the XIAO RP2040, the hardware watchdog and the Adafruit NeoPixel library.</p><ol><li>In Arduino IDE, open <strong>Arduino IDE → Settings…</strong> and add this line to <strong>Additional boards manager URLs:</strong> <code>https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json</code></li><li>Open <strong>Tools → Board → Boards Manager</strong>, search for <code>pico</code>, and install the core by <strong>Earle F. Philhower, III</strong>. Do not install the "Arduino Mbed OS RP2040" core for this course.</li><li>Select <strong>Tools → Board</strong> and find <strong>Seeed XIAO RP2040</strong> in the core's list of boards. The menu's group name changes between versions; search the list for "XIAO".</li><li>Install the <strong>Adafruit NeoPixel</strong> library through <strong>Tools → Manage Libraries…</strong>.</li></ol><h3 id="exercise-02-first-upload">Exercise 0.2: First upload</h3><ol><li>Plug the XIAO into the Mac with the USB-C cable. A new port appears under <strong>Tools → Port</strong>, named <code>/dev/cu.usbmodem…</code>.</li><li>If no port appears (a brand-new board, or one that crashed), hold the <strong>B</strong> (boot) button, plug in the cable, and release the button. The XIAO appears as a drive called <strong>RPI-RP2</strong>; the first upload works from there and later ones use the port.</li><li>Upload the sketch below and open the Serial Monitor at 115200 baud. Type <code>r</code>, <code>g</code>, <code>b</code> or <code>0</code> and press Enter.</li></ol><div class="code"><div class="code-label">xiao_hello.ino</div><pre><code>// Onboard NeoPixel and RGB LED on the XIAO RP2040 (arduino-pico core).
+#include &lt;Adafruit_NeoPixel.h&gt;
+
+const int NEO_POWER = 11;   // GPIO11 powers the onboard pixel
+const int NEO_DATA  = 12;   // GPIO12 is its data line
+const int LED_R = 17, LED_G = 16, LED_B = 25;  // separate RGB LED, on when LOW
+
+Adafruit_NeoPixel pixel(1, NEO_DATA, NEO_GRB + NEO_KHZ800);
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(NEO_POWER, OUTPUT);
+  digitalWrite(NEO_POWER, HIGH);
+  pixel.begin();
+  pixel.setBrightness(40);
+  for (int pin : {LED_R, LED_G, LED_B}) { pinMode(pin, OUTPUT); digitalWrite(pin, HIGH); }  // all off
+}
+
+void loop() {
+  if (!Serial.available()) return;
+  char c = Serial.read();
+  uint32_t colour = c == 'r' ? pixel.Color(255, 0, 0) : c == 'g' ? pixel.Color(0, 255, 0)
+                  : c == 'b' ? pixel.Color(0, 0, 255) : 0;
+  if (c == '\n' || c == '\r') return;
+  pixel.setPixelColor(0, colour);
+  pixel.show();
+  digitalWrite(LED_B, c == 'b' ? LOW : HIGH);   // the blue LED follows 'b'
+  Serial.printf("pixel %c, uptime %lu ms\n", c, millis());
+}</code></pre></div><p><strong>Test:</strong> each letter changes the pixel's colour, <code>0</code> turns it off, and the Serial Monitor confirms every key.</p><aside class="callout note"><p><strong>Note:</strong> On this core, <code>Serial</code> is the USB connection and the baud rate is ignored. <code>Serial1</code> is the hardware UART on D6 and D7; this course uses D7 as an input, so do not start <code>Serial1</code>.</p></aside><h3 id="exercise-03-the-pins-you-will-use">Exercise 0.3: The pins you will use</h3><ol><li>Print the XIAO pin drawing. Mark D1 (ARM), D2 (FIRE), D3 (drain sense), D7 (CHAIN) and D10 (RING) in colour.</li><li>With the XIAO on the breadboard and USB connected, measure 3V3 and 5V against GND with the meter. Write both in the log.</li><li>Write down the answer to: what is the highest voltage you may ever put on D1? (3.3 V; Lesson 1 keeps it under 3 V.)</li></ol></section>
+<section class="chapter" id="lesson-1-reading-the-interlock"><h2>Lesson 1: Reading the interlock</h2><p class="goal"><strong>Goal:</strong> read the interlock's two signals reliably and recognise the combinations that should never happen. <strong>Time:</strong> 2 hours. <strong>Pass:</strong> the XIAO reports all four switch combinations correctly, and flags a simulated welded contact and a simulated missing rail.</p><h3 id="two-signals-two-questions">Two signals, two questions</h3><p>The interlock board gives the XIAO two answers through two dividers:</p><ul><li><strong>CHAIN</strong> (D7) asks: is the coil fed? It is HIGH when the E-stop is released and the key is on.</li><li><strong>ARM</strong> (D1) asks: is the fire rail live? It is HIGH when the relay's contact has closed.</li></ul><p>In normal operation they move together, with the relay's few milliseconds between them. Any lasting disagreement means something is broken.</p><div class="table-wrap"><table><thead><tr><th>CHAIN</th><th>ARM</th><th>Meaning</th><th>Controller</th></tr></thead><tbody><tr><td>LOW</td><td>LOW</td><td>Key off or E-stop pressed: safe</td><td>SAFE</td></tr><tr><td>HIGH</td><td>HIGH</td><td>Key on, E-stop released, relay in: armed</td><td>may arm</td></tr><tr><td>HIGH</td><td>LOW</td><td>Coil fed but no rail: relay not pulling in, blown fuse, broken wire or divider</td><td>FAULT</td></tr><tr><td>LOW</td><td>HIGH</td><td>Rail live without coil feed: welded relay contact or a wiring error</td><td>FAULT, and switch off at the rocker</td></tr></tbody></table></div><h3 id="the-divider-with-numbers">The divider, with numbers</h3><figure><img src="diagrams/04-divider.svg" alt="The 12 V divider"><figcaption>Each divider is 22 kΩ and 10 kΩ in series on top and 10 kΩ to GND, so the pin sees 10 / 42 of the input:</figcaption></figure><ul><li>At 12.0 V: 12 × 10 / 42 = <strong>2.86 V</strong>, a clear HIGH (above about 2 V) with 0.44 V of margin to 3.3 V.</li><li>At 13.8 V (a lead-acid battery on charge): 3.29 V, at the limit. If your 12 V supply can run above 13.5 V, change the bottom resistor to 8.2 kΩ.</li><li>At 9 V (a sagging supply): 2.14 V, still HIGH but only just. The firmware does not trust levels near the threshold; Lesson 3 adds the rail voltage to the status report.</li><li>The divider draws 12 V / 42 kΩ = 0.29 mA: negligible for the supply, and small enough that a fault in the top resistor cannot push much current into the pin.</li></ul><p>ARM is on D1, which is also the analog input A1, so the firmware can read the rail voltage itself: rail = ADC voltage × 42 / 10.</p><h3 id="exercise-11-measure-before-you-connect">Exercise 1.1: Measure before you connect</h3><ol><li>Power the interlock board from the bench supply at 12.0 V, current limit 0.2 A. Leave the XIAO disconnected.</li><li>With the meter, measure both divider outputs in all four combinations of key and E-stop. Write the eight readings in the log.</li><li><strong>Test:</strong> every reading is either below 0.3 V or between 2.7 and 3.0 V. Anything above 3.0 V: stop and check the resistors.</li><li>Join the interlock board's GND to the XIAO's GND. Then connect the ARM output to D1 and the CHAIN output to D7.</li></ol><h3 id="exercise-12-read-debounce-check">Exercise 1.2: Read, debounce, check</h3><p>Key switches and E-stops bounce, and the relay contact bounces when it closes. The sketch below accepts a new level only after it has been stable for 20 ms, and reports how long the two signals disagreed.</p><div class="code long"><div class="code-label">interlock_inputs.ino</div><pre><code>// Reads ARM (D1) and CHAIN (D7) from the interlock dividers, debounces them,
+// prints every change, and flags disagreement that lasts longer than the relay needs.
+const int ARM_PIN   = 27;   // D1, also A1
+const int CHAIN_PIN = 1;    // D7
+const uint32_t DEBOUNCE_MS = 20;
+const uint32_t RELAY_MS    = 50;   // G5LE: 10 ms operate, 5 ms release at most, plus bounce
+
+struct Input { int pin; bool stable; bool last; uint32_t since; };
+Input arm = {ARM_PIN, false, false, 0}, chain = {CHAIN_PIN, false, false, 0};
+uint32_t disagreeSince = 0;
+bool reported = false;
+
+bool update(Input &amp;in, uint32_t now) {        // returns true when the stable level changes
+  bool raw = digitalRead(in.pin);
+  if (raw != in.last) { in.last = raw; in.since = now; return false; }
+  if (raw != in.stable &amp;&amp; now - in.since &gt;= DEBOUNCE_MS) { in.stable = raw; return true; }
+  return false;
+}
+
+float railVolts() {
+  return analogRead(ARM_PIN) * 3.3f / 4095.0f * 42.0f / 10.0f;
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(ARM_PIN, INPUT);       // the divider defines the level; no internal pull
+  pinMode(CHAIN_PIN, INPUT);
+  analogReadResolution(12);
+}
+
+void loop() {
+  uint32_t now = millis();
+  bool changed = update(arm, now) | update(chain, now);
+  if (changed) {
+    Serial.printf("%8lu ms  CHAIN=%d ARM=%d  rail %.1f V\n", now, chain.stable, arm.stable, railVolts());
+  }
+  if (arm.stable != chain.stable) {
+    if (!disagreeSince) disagreeSince = now | 1;
+    if (!reported &amp;&amp; now - disagreeSince &gt; RELAY_MS) {
+      Serial.println(arm.stable ? "FAULT: rail live without coil feed (welded contact?)"
+                                : "FAULT: coil fed but no rail (relay, fuse, wiring?)");
+      reported = true;
+    }
+  } else {
+    if (disagreeSince &amp;&amp; !reported) Serial.printf("   agreed again after %lu ms\n", now - disagreeSince);
+    disagreeSince = 0;
+    reported = false;
+  }
+}</code></pre></div><ol><li>Upload and open the Serial Monitor.</li><li>Turn the key on and off ten times, then press and release the E-stop with the key on ten times. Each change prints one line, and "agreed again after … ms" stays well under 50 ms.</li><li>Check the rail voltage printed against the meter on the rail. Note the difference in the log.</li></ol><p><strong>Test:</strong> every switch action gives exactly one line per signal, no FAULT messages, and the rail reading is within 0.3 V of the meter.</p><h3 id="exercise-13-simulate-the-impossible">Exercise 1.3: Simulate the impossible</h3><ol><li>Key off. Disconnect the ARM divider's input from the rail and touch it to the 12 V supply instead, for two seconds: this is what a welded contact looks like. The sketch prints the rail-live-without-coil-feed FAULT. Reconnect it to the rail.</li><li>Key on. Pull the fuse (or open the rail wire) so the relay clicks but the rail stays dead: the coil-fed-but-no-rail FAULT appears.</li></ol><p><strong>Test:</strong> both faults are detected within about 50 ms and reported once each.</p><aside class="callout warn"><p><strong>Warning:</strong> Step 1 is a bench simulation on the rehearsal board with the dummy load disconnected. Never bridge to the rail on the real tower.</p></aside></section>
+<section class="chapter" id="lesson-2-a-fail-safe-output"><h2>Lesson 2: A fail-safe output</h2><p class="goal"><strong>Goal:</strong> make sure the fire output cannot switch on by accident: not at power-up, not during a reset, not during a firmware upload. <strong>Time:</strong> 2 hours. <strong>Pass:</strong> with the scope in Normal trigger mode on the gate, power cycles, resets and uploads produce no pulse at all.</p><h3 id="what-fail-safe-means-for-a-pin">What "fail-safe" means for a pin</h3><figure><img src="diagrams/05-output-states.svg" alt="The output stays off through every phase"><figcaption>The XIAO's pin is not under your sketch's control all the time. Between power-up and <code>setup()</code>, during a reset, and while the board sits in its USB bootloader for an upload, the RP2040 leaves its pins as inputs. An input drives nothing: the MOSFET module's gate floats unless something holds it down, and a floating gate can switch a MOSFET on.</figcaption></figure><p>The rule: <strong>the off state must not depend on the software running.</strong> A 10 kΩ resistor from the module's input to GND holds the gate low whenever the pin is not actively driven. Many MOSFET modules already have one; check yours with the meter (IN to GND, module unpowered), and add one on your board if it is missing or larger than 100 kΩ. The RP2040 also enables a weak internal pull-down on its pins at reset, but that is not something to rely on: the external resistor is the guarantee.</p><p>In the sketch, write the pin LOW before making it an output, so it never drives HIGH even for a moment.</p><h3 id="exercise-21-wire-the-output-stage">Exercise 2.1: Wire the output stage</h3><ol><li>Check the MOSFET module: it must be fully on with 3.3 V at its input. A module that needs 5 V or 10 V (many IRF520 boards do) heats up and switches only partly at 3.3 V. If in doubt, measure the voltage across the module's output while it is on: it should be well under 0.2 V at the dummy load's current.</li><li>Wire D2 → 330 Ω → module input, and 10 kΩ from module input to GND (unless the module already has it).</li><li>Wire the dummy load from the <strong>fire rail</strong> (not the 12 V supply) to the module's output minus. The module's output plus, if it has one, goes to the fire rail too. If the dummy load is a coil, fit a flyback diode across it, band to the rail.</li><li>Join the module's GND to the common GND.</li></ol><h3 id="exercise-22-a-first-pulse">Exercise 2.2: A first pulse</h3><div class="code"><div class="code-label">output_test.ino</div><pre><code>// Fire-output test: 'p' gives one 100 ms pulse on D2. The pin is LOW before it becomes an output.
+const int FIRE_PIN = 28;            // D2
+const uint32_t PULSE_MS = 100;
+
+void setup() {
+  digitalWrite(FIRE_PIN, LOW);      // set the level first ...
+  pinMode(FIRE_PIN, OUTPUT);        // ... then drive it
+  Serial.begin(115200);
+}
+
+void loop() {
+  if (Serial.available() &amp;&amp; Serial.read() == 'p') {
+    digitalWrite(FIRE_PIN, HIGH);
+    delay(PULSE_MS);                // acceptable in a test sketch only; Lesson 3 never blocks
+    digitalWrite(FIRE_PIN, LOW);
+    Serial.println("pulse done");
+  }
+}</code></pre></div><ol><li>Upload. Bench supply at 12 V, current limit 0.5 A. Key on: the relay clicks and the rail is live.</li><li>Type <code>p</code>: the dummy load flashes for 100 ms.</li><li>Turn the key off and type <code>p</code> again: nothing happens, because the rail is dead. This is the interlock doing its job, with the firmware ignorant of it.</li></ol><h3 id="exercise-23-prove-it-on-the-scope">Exercise 2.3: Prove it on the scope</h3><ol><li>Probe CH1 on the module's input (the gate side), CH2 on the module's output minus (the drain side), ground clips on the common GND. CH1 at 1 V/div, CH2 at 5 V/div.</li><li>Trigger on CH1, rising edge at 1.5 V, <strong>Normal</strong> mode, 20 ms/div (<a href="../sds804x-hd/sds804x-hd-course.html#exercise-32-normal-mode-and-holdoff">how Normal mode works</a>).</li><li>Type <code>p</code> and measure the pulse with the automatic +Width measurement (<a href="../sds804x-hd/sds804x-hd-course.html#exercise-21-automatic-measurements">Exercise 2.1 of the oscilloscope course</a>): 100 ms.</li><li>Now, with the key on and the trigger still armed, unplug and replug the USB cable five times, press the XIAO's <strong>R</strong> (reset) button five times, and upload the sketch again twice.</li><li>Remove the 10 kΩ pull-down (and use a module without one, if yours has it built in) and repeat step 4, watching CH1 with a slower trigger level of 0.5 V. Put the resistor back afterwards.</li></ol><p><strong>Test:</strong> with the pull-down fitted, the scope never triggers in step 4. Without it, write down what you saw on the floating gate. Either way, the pull-down stays.</p><aside class="callout tip"><p><strong>Tip:</strong> On the drain side (CH2) you can also see the dummy load switching: the drain falls from 12 V to near 0 V during the pulse. If it only falls part of the way, the module is not fully on at 3.3 V.</p></aside></section>
+<section class="chapter" id="lesson-3-the-state-machine"><h2>Lesson 3: The state machine</h2><p class="goal"><strong>Goal:</strong> turn inputs and an output into a controller whose behaviour you can write down as a table and test row by row. <strong>Time:</strong> 2.5 hours. <strong>Pass:</strong> every transition in the table works as written; a pulse can never be longer than the maximum or closer than the re-arm time to the previous one.</p><h3 id="four-states">Four states</h3><figure><img src="diagrams/06-state-machine.svg" alt="States and transitions"></figure><div class="table-wrap"><table><thead><tr><th>State</th><th>Output</th><th>Enters when</th><th>Leaves when</th></tr></thead><tbody><tr><td>SAFE</td><td>off</td><td>at boot; interlock opens; host lost; FAULT cleared</td><td>interlock closed and stable for 0.5 s (and host alive, from Lesson 4): ARMED</td></tr><tr><td>ARMED</td><td>off</td><td>from SAFE; after a pulse</td><td>fire command accepted: FIRING; interlock opens or host lost: SAFE; inputs disagree: FAULT</td></tr><tr><td>FIRING</td><td><strong>on</strong></td><td>fire command in ARMED, outside the re-arm time</td><td>pulse time over or STOP: ARMED; interlock opens: SAFE; inputs disagree: FAULT</td></tr><tr><td>FAULT</td><td>off</td><td>inputs disagree longer than 50 ms</td><td>CLEAR command with the key off (both inputs LOW): SAFE</td></tr></tbody></table></div><p>Rules that hold in every state:</p><ul><li>The output is only ever HIGH in FIRING. Every loop, in every other state, the firmware writes it LOW again.</li><li>A pulse has a maximum length (500 ms here; set it to what your actuator needs, with margin) and is ended by elapsed time, not by a second command.</li><li>After a pulse ends, the next one is refused for the re-arm time (2 s here).</li><li>FAULT is latched: it does not clear by itself when the inputs agree again. A person turns the key off, looks at the tower, and clears it.</li><li>Nothing ever waits: no <code>delay()</code>, no blocking reads. The loop runs thousands of times a second, so every check happens within a millisecond.</li></ul><h3 id="exercise-31-the-state-machine-sketch">Exercise 3.1: The state machine sketch</h3><p>This version takes single-letter commands from the Serial Monitor: <code>f</code> fires a 200 ms pulse, <code>s</code> stops, <code>c</code> clears a fault. Lesson 4 replaces them with a proper protocol.</p><div class="code long"><div class="code-label">state_machine.ino</div><pre><code>// SAFE / ARMED / FIRING / FAULT for the tower 2 fire output (XIAO RP2040, arduino-pico).
+const int ARM_PIN = 27, CHAIN_PIN = 1, FIRE_PIN = 28;   // D1, D7, D2
+const uint32_t DEBOUNCE_MS = 20, RELAY_MS = 50, ARM_SETTLE_MS = 500;
+const uint32_t PULSE_MS = 200, MAX_PULSE_MS = 500, MIN_REARM_MS = 2000;
+
+enum State { SAFE, ARMED, FIRING, FAULT };
+const char *NAMES[] = {"SAFE", "ARMED", "FIRING", "FAULT"};
+State state = SAFE;
+
+struct Input { int pin; bool stable; bool last; uint32_t since; };
+Input arm = {ARM_PIN, false, false, 0}, chain = {CHAIN_PIN, false, false, 0};
+uint32_t closedSince = 0, disagreeSince = 0, fireStart = 0, fireLen = 0, lastFireEnd = 0;
+
+void update(Input &amp;in, uint32_t now) {
+  bool raw = digitalRead(in.pin);
+  if (raw != in.last) { in.last = raw; in.since = now; }
+  else if (now - in.since &gt;= DEBOUNCE_MS) in.stable = raw;
+}
+
+void enter(State s, const char *why) {
+  if (s != FIRING) digitalWrite(FIRE_PIN, LOW);
+  if (state == FIRING &amp;&amp; s != FIRING) lastFireEnd = millis() | 1;
+  state = s;
+  Serial.printf("%8lu ms  %s (%s)\n", millis(), NAMES[s], why);
+}
+
+void fire(uint32_t ms, uint32_t now) {
+  if (state != ARMED) { Serial.println("refused: not armed"); return; }
+  if (ms == 0 || ms &gt; MAX_PULSE_MS) { Serial.println("refused: pulse length"); return; }
+  if (lastFireEnd &amp;&amp; now - lastFireEnd &lt; MIN_REARM_MS) { Serial.println("refused: re-arm time"); return; }
+  if (!arm.stable) { Serial.println("refused: no rail"); return; }
+  fireStart = now; fireLen = ms;
+  enter(FIRING, "command");
+  digitalWrite(FIRE_PIN, HIGH);
+}
+
+void setup() {
+  digitalWrite(FIRE_PIN, LOW);
+  pinMode(FIRE_PIN, OUTPUT);
+  pinMode(ARM_PIN, INPUT);
+  pinMode(CHAIN_PIN, INPUT);
+  Serial.begin(115200);
+}
+
+void loop() {
+  uint32_t now = millis();
+  update(arm, now);
+  update(chain, now);
+  bool closed = arm.stable &amp;&amp; chain.stable;
+
+  // 1. Disagreement lasting longer than the relay needs: latch FAULT.
+  if (arm.stable != chain.stable) { if (!disagreeSince) disagreeSince = now | 1; }
+  else disagreeSince = 0;
+  if (disagreeSince &amp;&amp; now - disagreeSince &gt; RELAY_MS &amp;&amp; state != FAULT)
+    enter(FAULT, arm.stable ? "rail without coil feed" : "coil feed without rail");
+
+  // 2. Interlock open: back to SAFE from ARMED or FIRING.
+  if (!closed) closedSince = 0; else if (!closedSince) closedSince = now | 1;
+  if (!closed &amp;&amp; (state == ARMED || state == FIRING) &amp;&amp; state != FAULT) enter(SAFE, "interlock open");
+
+  // 3. SAFE to ARMED after the interlock has been closed and stable for a while.
+  if (state == SAFE &amp;&amp; closedSince &amp;&amp; now - closedSince &gt;= ARM_SETTLE_MS) enter(ARMED, "interlock closed");
+
+  // 4. End the pulse by time.
+  if (state == FIRING &amp;&amp; now - fireStart &gt;= fireLen) enter(ARMED, "pulse done");
+
+  // 5. Commands.
+  if (Serial.available()) {
+    char c = Serial.read();
+    if (c == 'f') fire(PULSE_MS, now);
+    if (c == 's' &amp;&amp; state == FIRING) enter(ARMED, "stop");
+    if (c == 'c' &amp;&amp; state == FAULT) {
+      if (!arm.stable &amp;&amp; !chain.stable) enter(SAFE, "cleared"); else Serial.println("refused: key must be off");
+    }
+  }
+
+  // 6. Belt and braces: outside FIRING the output is LOW, every loop.
+  if (state != FIRING) digitalWrite(FIRE_PIN, LOW);
+}</code></pre></div><ol><li>Upload. Key off: the Serial Monitor shows nothing until you act.</li><li>Key on: after half a second, <code>ARMED (interlock closed)</code>.</li><li>Type <code>f</code>: <code>FIRING (command)</code>, then <code>ARMED (pulse done)</code> 200 ms later. The dummy load flashes.</li><li>Type <code>f</code> twice in quick succession: the second is refused for the re-arm time.</li><li>Key off while armed: <code>SAFE (interlock open)</code>. Type <code>f</code>: refused.</li><li>Repeat the welded-contact simulation of Exercise 1.3: <code>FAULT</code>. Type <code>c</code> with the key on: refused. Key off, <code>c</code>: <code>SAFE (cleared)</code>.</li></ol><p><strong>Test:</strong> every step behaves as described. Write the state sequence in the log.</p><h3 id="exercise-32-change-a-limit-then-test-the-limit">Exercise 3.2: Change a limit, then test the limit</h3><ol><li>Change <code>PULSE_MS</code> to 600. Upload and type <code>f</code>: refused, because 600 is above <code>MAX_PULSE_MS</code>.</li><li>Set <code>PULSE_MS</code> back to 200. Change <code>MIN_REARM_MS</code> to 5000, upload, and check with a stopwatch that the second pulse is refused for 5 s.</li><li>Set the limits to what your actuator needs, with margin, and write them on Card B.</li></ol><p><strong>Test:</strong> both limits hold; the values you chose are written down with a one-line reason each.</p><h3 id="exercise-33-optional-sense-the-mosfets-drain">Exercise 3.3 (optional): Sense the MOSFET's drain</h3><p>A shorted MOSFET fires the actuator the moment the rail goes live. You can detect it before that happens.</p><ol><li>Build a third divider (22 kΩ + 10 kΩ on top, 10 kΩ to GND) from the module's output minus (the drain side of the load) to D3.</li><li>With the key on and the output off, the drain sits at the rail voltage through the load: D3 reads about 2.9 V. With the output on, the drain falls near 0 V: D3 reads LOW.</li><li>Add a rule to the sketch: in ARMED, if D3 reads LOW for more than 50 ms while the output is off, enter FAULT ("output stage conducting"). In FIRING, if D3 stays HIGH, report "output stage not switching".</li></ol><p><strong>Test:</strong> pull the module's input up to 3.3 V through 1 kΩ (simulating a shorted MOSFET) with the key on: FAULT within 50 ms of the rail going live.</p><aside class="callout note"><p><strong>Note:</strong> An open dummy load also reads LOW on D3, so the fault message says "output stage conducting or load open". Either way the tower should not arm.</p></aside></section>
+<section class="chapter" id="lesson-4-talking-to-the-mac"><h2>Lesson 4: Talking to the Mac</h2><p class="goal"><strong>Goal:</strong> a robust line protocol between the Mac and the controller, with a heartbeat that drops the controller to SAFE when the Mac goes quiet. <strong>Time:</strong> 2.5 hours. <strong>Pass:</strong> the Python host fires a pulse on command; muting the heartbeat drops the controller to SAFE within 1 s; garbage on the line is answered with an error, never acted on.</p><h3 id="the-protocol">The protocol</h3><figure><img src="diagrams/07-protocol.svg" alt="Commands, replies and the heartbeat"><figcaption>Plain text lines, ASCII, ending in a newline. One command per line, one reply per command; unsolicited events start with <code>EVT</code>.</figcaption></figure><div class="table-wrap"><table><thead><tr><th>Host sends</th><th>Controller replies</th><th>Notes</th></tr></thead><tbody><tr><td><code>PING</code></td><td><code>OK PONG &lt;state&gt;</code></td><td>The heartbeat: every 200 ms</td></tr><tr><td><code>STATUS</code></td><td><code>OK STATUS state=… arm=… chain=… rail=…V rearm=…ms</code></td><td>Everything a host needs to display</td></tr><tr><td><code>FIRE &lt;ms&gt;</code></td><td><code>OK FIRE &lt;ms&gt;</code> or <code>ERR NOT_ARMED</code>, <code>ERR RANGE</code>, <code>ERR REARM</code>, <code>ERR NO_RAIL</code></td><td>Pulse length in milliseconds, 1 to the maximum</td></tr><tr><td><code>STOP</code></td><td><code>OK STOP</code></td><td>Ends a pulse early; harmless otherwise</td></tr><tr><td><code>CLEAR</code></td><td><code>OK CLEAR</code> or <code>ERR KEY_ON</code>, <code>ERR NO_FAULT</code></td><td>Clears a latched FAULT with the key off</td></tr><tr><td>anything else</td><td><code>ERR UNKNOWN</code></td><td>Also for lines over 63 characters</td></tr><tr><td>(none)</td><td><code>EVT STATE &lt;state&gt; &lt;reason&gt;</code></td><td>Every state change</td></tr><tr><td>(none)</td><td><code>EVT BOOT &lt;reason&gt;</code></td><td>At start-up: <code>power-on</code> or <code>watchdog</code></td></tr></tbody></table></div><p><strong>The heartbeat.</strong> Any valid command counts as a sign of life. If nothing valid arrives for 1000 ms while the controller is ARMED or FIRING, it ends any pulse and drops to SAFE with the reason <code>host lost</code>. It re-arms by itself once the host is back and the interlock is closed. The controller never needs the host to be safe; it needs the host only to fire.</p><h3 id="exercise-41-the-controller-firmware">Exercise 4.1: The controller firmware</h3><p>This is the whole controller. The watchdog and the ring are already in it, switched off with <code>USE_WATCHDOG</code> and <code>USE_RING</code>; Lessons 5 and 6 switch them on. <code>TEST_COMMANDS</code> enables a <code>HANG</code> command for the fault tests in Lesson 7.</p><div class="code long"><div class="code-label">tower_controller.ino</div><pre><code>// Tower 2 fire controller for the Seeed XIAO RP2040 (Earle Philhower's arduino-pico core).
+// The hardware interlock (key, E-stop, relay) is the safety system. This firmware can only refuse:
+// it fires only when both interlock inputs agree, for a bounded time, with a live host.
+#include &lt;Adafruit_NeoPixel.h&gt;
+#include &lt;hardware/watchdog.h&gt;
+
+#define USE_WATCHDOG  0   // Lesson 5: set to 1
+#define USE_RING      0   // Lesson 6: set to 1
+#define TEST_COMMANDS 1   // HANG for fault injection; set to 0 on the finished tower
+
+// ---- Pins: RP2040 GPIO numbers, XIAO labels in the comments ----
+const int ARM_PIN   = 27;   // D1 (A1): fire rail present, divider 22k+10k / 10k
+const int CHAIN_PIN = 1;    // D7: coil feed present (key on, E-stop released)
+const int FIRE_PIN  = 28;   // D2: MOSFET module input, 10k pull-down to GND
+const int RING_PIN  = 3;    // D10: WS2812 data through the 74AHCT125
+const int RING_LEDS = 12;   // pixels on your ring
+
+// ---- Limits ----
+const uint32_t DEBOUNCE_MS   = 20;
+const uint32_t RELAY_MS      = 50;     // allowed ARM/CHAIN disagreement while the relay moves
+const uint32_t ARM_SETTLE_MS = 500;
+const uint32_t MAX_PULSE_MS  = 500;
+const uint32_t MIN_REARM_MS  = 2000;
+const uint32_t HEARTBEAT_MS  = 1000;
+const uint32_t WATCHDOG_MS   = 500;
+
+enum State { SAFE, ARMED, FIRING, FAULT };
+const char *NAMES[] = {"SAFE", "ARMED", "FIRING", "FAULT"};
+State state = SAFE;
+
+struct Input { int pin; bool stable; bool last; uint32_t since; };
+Input arm = {ARM_PIN, false, false, 0}, chain = {CHAIN_PIN, false, false, 0};
+uint32_t closedSince = 0, disagreeSince = 0, fireStart = 0, fireLen = 0, lastFireEnd = 0;
+uint32_t lastHost = 0;
+bool hostSeen = false;
+
+char line[64];
+size_t lineLen = 0;
+bool lineTooLong = false;
+
+#if USE_RING
+Adafruit_NeoPixel ring(RING_LEDS, RING_PIN, NEO_GRB + NEO_KHZ800);
+uint32_t lastRing = 0;
+#endif
+
+void update(Input &amp;in, uint32_t now) {
+  bool raw = digitalRead(in.pin);
+  if (raw != in.last) { in.last = raw; in.since = now; }
+  else if (now - in.since &gt;= DEBOUNCE_MS) in.stable = raw;
+}
+
+float railVolts() { return analogRead(ARM_PIN) * 3.3f / 4095.0f * 42.0f / 10.0f; }
+
+bool hostAlive(uint32_t now) { return hostSeen &amp;&amp; now - lastHost &lt; HEARTBEAT_MS; }
+
+void enter(State s, const char *why) {
+  if (s != FIRING) digitalWrite(FIRE_PIN, LOW);
+  if (state == FIRING &amp;&amp; s != FIRING) lastFireEnd = millis() | 1;
+  if (s == state) return;
+  state = s;
+  Serial.printf("EVT STATE %s %s\n", NAMES[s], why);
+}
+
+void command(char *cmd, uint32_t now) {
+  char *arg = strchr(cmd, ' ');
+  if (arg) *arg++ = '\0';
+  bool valid = true;
+  if (!strcmp(cmd, "PING")) {
+    Serial.printf("OK PONG %s\n", NAMES[state]);
+  } else if (!strcmp(cmd, "STATUS")) {
+    uint32_t wait = lastFireEnd &amp;&amp; now - lastFireEnd &lt; MIN_REARM_MS ? MIN_REARM_MS - (now - lastFireEnd) : 0;
+    Serial.printf("OK STATUS state=%s arm=%d chain=%d rail=%.1fV rearm=%lums\n",
+                  NAMES[state], arm.stable, chain.stable, railVolts(), wait);
+  } else if (!strcmp(cmd, "FIRE")) {
+    long ms = arg ? strtol(arg, nullptr, 10) : 0;
+    if (state != ARMED) Serial.println("ERR NOT_ARMED");
+    else if (ms &lt; 1 || ms &gt; (long)MAX_PULSE_MS) Serial.println("ERR RANGE");
+    else if (lastFireEnd &amp;&amp; now - lastFireEnd &lt; MIN_REARM_MS) Serial.println("ERR REARM");
+    else if (!arm.stable) Serial.println("ERR NO_RAIL");
+    else {
+      fireStart = now;
+      fireLen = ms;
+      enter(FIRING, "command");
+      digitalWrite(FIRE_PIN, HIGH);
+      Serial.printf("OK FIRE %ld\n", ms);
+    }
+  } else if (!strcmp(cmd, "STOP")) {
+    if (state == FIRING) enter(ARMED, "stop");
+    Serial.println("OK STOP");
+  } else if (!strcmp(cmd, "CLEAR")) {
+    if (state != FAULT) Serial.println("ERR NO_FAULT");
+    else if (arm.stable || chain.stable) Serial.println("ERR KEY_ON");
+    else { enter(SAFE, "cleared"); Serial.println("OK CLEAR"); }
+#if TEST_COMMANDS
+  } else if (!strcmp(cmd, "HANG")) {
+    Serial.println("OK HANG");
+    Serial.flush();
+    while (true) { }                    // the watchdog must rescue us
+#endif
+  } else {
+    Serial.println("ERR UNKNOWN");
+    valid = false;
+  }
+  if (valid) { lastHost = now; hostSeen = true; }
+}
+
+void readHost(uint32_t now) {
+  while (Serial.available()) {
+    char c = Serial.read();
+    if (c == '\r') continue;
+    if (c == '\n') {
+      line[lineLen] = '\0';
+      if (lineTooLong) Serial.println("ERR UNKNOWN");
+      else if (lineLen) command(line, now);
+      lineLen = 0;
+      lineTooLong = false;
+    } else if (lineLen &lt; sizeof(line) - 1) {
+      line[lineLen++] = c;
+    } else {
+      lineTooLong = true;
+    }
+  }
+}
+
+#if USE_RING
+void showRing(uint32_t now) {
+  if (now - lastRing &lt; 50) return;      // 20 updates a second are plenty
+  lastRing = now;
+  bool blink = (now / 250) % 2;
+  uint32_t c = state == SAFE   ? ring.Color(0, 60, 0)
+             : state == ARMED  ? ring.Color(120, 60, 0)
+             : state == FIRING ? ring.Color(255, 0, 0)
+             : (blink ? ring.Color(255, 0, 0) : 0);
+  for (int i = 0; i &lt; RING_LEDS; i++) ring.setPixelColor(i, c);
+  if (!hostAlive(now)) ring.setPixelColor(0, ring.Color(0, 0, 120));   // one blue pixel: no host
+  ring.show();
+}
+#endif
+
+void setup() {
+  digitalWrite(FIRE_PIN, LOW);          // level first, then output: never a glitch HIGH
+  pinMode(FIRE_PIN, OUTPUT);
+  pinMode(ARM_PIN, INPUT);
+  pinMode(CHAIN_PIN, INPUT);
+  analogReadResolution(12);
+  Serial.begin(115200);                 // USB; never wait for the host here
+#if USE_RING
+  ring.begin();
+  ring.setBrightness(60);
+  ring.clear();
+  ring.show();
+#endif
+  // watchdog_enable_caused_reboot() is true only after a timeout of a watchdog that the firmware started,
+  // not after the bootloader's own reset at the end of an upload.
+  Serial.printf("EVT BOOT %s\n", watchdog_enable_caused_reboot() ? "watchdog" : "power-on");
+#if USE_WATCHDOG
+  rp2040.wdt_begin(WATCHDOG_MS);        // once started, it cannot be stopped
+#endif
+}
+
+void loop() {
+  uint32_t now = millis();
+#if USE_WATCHDOG
+  rp2040.wdt_reset();
+#endif
+  update(arm, now);
+  update(chain, now);
+  bool closed = arm.stable &amp;&amp; chain.stable;
+
+  if (arm.stable != chain.stable) { if (!disagreeSince) disagreeSince = now | 1; }
+  else disagreeSince = 0;
+  if (disagreeSince &amp;&amp; now - disagreeSince &gt; RELAY_MS &amp;&amp; state != FAULT)
+    enter(FAULT, arm.stable ? "rail_without_coil_feed" : "coil_feed_without_rail");
+
+  if (!closed) closedSince = 0; else if (!closedSince) closedSince = now | 1;
+  if (state == ARMED || state == FIRING) {
+    if (!closed) enter(SAFE, "interlock_open");
+    else if (!hostAlive(now)) enter(SAFE, "host_lost");
+  }
+  if (state == SAFE &amp;&amp; closedSince &amp;&amp; now - closedSince &gt;= ARM_SETTLE_MS &amp;&amp; hostAlive(now))
+    enter(ARMED, "ready");
+  if (state == FIRING &amp;&amp; now - fireStart &gt;= fireLen) enter(ARMED, "pulse_done");
+
+  readHost(now);
+
+  if (state != FIRING) digitalWrite(FIRE_PIN, LOW);   // every loop, whatever happened above
+#if USE_RING
+  showRing(now);
+#endif
+}</code></pre></div><ol><li>Upload. Open the Serial Monitor and type <code>STATUS</code>: the reply shows the state and both inputs.</li><li>Turn the key on, then type <code>PING</code> and press Enter. The controller arms half a second after the interlock closed, but only while PINGs keep coming, which you cannot type fast enough: one second after your last PING it falls back to SAFE with <code>host_lost</code>. That is the heartbeat at work. Close the Serial Monitor for the next exercise.</li></ol><h3 id="exercise-42-the-python-host">Exercise 4.2: The Python host</h3><ol><li>In Terminal, make a virtual environment and install pyserial:</li></ol><div class="code"><div class="code-label">install the host</div><pre><code>python3 -m venv ~/tower-venv
+source ~/tower-venv/bin/activate
+python3 -m pip install pyserial</code></pre></div><ol start="2" style="counter-reset: step 1"><li>Save the script below as <code>tower_host.py</code> and run it with <code>python3 tower_host.py</code>. It finds the XIAO's port by itself when exactly one <code>/dev/cu.usbmodem…</code> is present; otherwise pass the port as an argument.</li></ol><div class="code long"><div class="code-label">tower_host.py</div><pre><code>#!/usr/bin/env python3
+"""Minimal host for tower_controller.ino: sends PING every 200 ms, prints every reply and event,
+and forwards the commands you type. 'mute' stops the heartbeat, 'unmute' restarts it, 'quit' exits."""
+import glob
+import sys
+import threading
+import time
+
+import serial  # python3 -m pip install pyserial
+
+
+def find_port():
+    ports = sorted(glob.glob('/dev/cu.usbmodem*'))
+    if len(ports) != 1:
+        sys.exit(f'Expected one /dev/cu.usbmodem* port, found {ports or "none"}; pass the port as an argument.')
+    return ports[0]
+
+
+port = sys.argv[1] if len(sys.argv) &gt; 1 else find_port()
+link = serial.Serial(port, 115200, timeout=0.1)
+lock = threading.Lock()
+running = True
+pinging = True
+
+
+def send(cmd):
+    with lock:
+        link.write((cmd + '\n').encode('ascii'))
+
+
+def pinger():
+    while running:
+        if pinging:
+            send('PING')
+        time.sleep(0.2)
+
+
+def reader():
+    while running:
+        text = link.readline().decode('ascii', 'replace').strip()
+        if text and not text.startswith('OK PONG'):
+            print(time.strftime('%H:%M:%S'), '&lt;', text)
+
+
+threading.Thread(target=pinger, daemon=True).start()
+threading.Thread(target=reader, daemon=True).start()
+print(f'Connected to {port}. Commands: STATUS, FIRE &lt;ms&gt;, STOP, CLEAR, HANG; mute, unmute, quit.')
+try:
+    for typed in sys.stdin:
+        typed = typed.strip()
+        if typed == 'quit':
+            break
+        if typed in ('mute', 'unmute'):
+            pinging = typed == 'unmute'
+            print('heartbeat', 'running' if pinging else 'stopped')
+            continue
+        if typed:
+            send(typed.upper())
+finally:
+    running = False
+    link.close()</code></pre></div><ol start="3" style="counter-reset: step 2"><li>With the host running, turn the key on: <code>EVT STATE ARMED ready</code>.</li><li>Type <code>FIRE 150</code>: <code>OK FIRE 150</code>, the load flashes, then <code>EVT STATE ARMED pulse_done</code>.</li><li>Type <code>FIRE 150</code> again at once: <code>ERR REARM</code>. Type <code>FIRE 5000</code>: <code>ERR RANGE</code>. Type <code>fire banana</code>: <code>ERR RANGE</code>; type <code>hello</code>: <code>ERR UNKNOWN</code>.</li><li>Type <code>mute</code>. Within one second: <code>EVT STATE SAFE host_lost</code>. Type <code>unmute</code>: the controller re-arms.</li><li>Press <strong>Ctrl-C</strong> to stop the host while armed. Start it again and type <code>STATUS</code>: the controller went SAFE while you were away.</li></ol><p><strong>Test:</strong> every reply matches the protocol table, and muting the heartbeat always ends in SAFE within 1 s.</p><aside class="callout note"><p><strong>Note:</strong> Only one program can hold the serial port. If the host reports the port busy, close the Arduino Serial Monitor.</p></aside></section>
+<section class="chapter" id="lesson-5-the-watchdog"><h2>Lesson 5: The watchdog</h2><p class="goal"><strong>Goal:</strong> make a hang in the firmware end in a reset with the output off, and know afterwards that it happened. <strong>Time:</strong> 1.5 hours. <strong>Pass:</strong> <code>HANG</code> reboots the XIAO within 0.5 s, the output is off throughout, and the controller reports <code>EVT BOOT watchdog</code>.</p><h3 id="why-a-watchdog">Why a watchdog</h3><p>The state machine is only as good as the loop that runs it. A bug, a stuck library call or a corrupted variable can stop <code>loop()</code> with the output in whatever state it was. If that state is FIRING, the pulse never ends.</p><p>The RP2040 has a hardware watchdog: a timer that resets the whole chip unless the firmware reloads it in time. <code>rp2040.wdt_begin(500)</code> starts it with a 500 ms timeout; <code>rp2040.wdt_reset()</code> reloads it. The firmware calls <code>wdt_reset()</code> once per loop, so the watchdog only fires if the loop stops. A reset puts every pin back to input, the pull-down turns the MOSFET off, and the firmware starts again in SAFE.</p><p>At start-up the firmware reports why it booted. The Pico SDK function <code>watchdog_enable_caused_reboot()</code> is true only when a watchdog started by the firmware ran out; the plain <code>watchdog_caused_reboot()</code> is also true after an upload, because the bootloader restarts the chip through the watchdog. If your core version does not know the first function, use the second and ignore the report right after uploads.</p><p>Two rules from the arduino-pico documentation: once started, the watchdog cannot be stopped; and the timeout must be longer than the slowest pass through <code>loop()</code>. Here a loop pass takes well under a millisecond, so 500 ms is generous and still short enough to end a pulse in time.</p><h3 id="exercise-51-switch-it-on-and-test-it">Exercise 5.1: Switch it on and test it</h3><ol><li>In <code>tower_controller.ino</code>, set <code>USE_WATCHDOG</code> to 1 and upload.</li><li>Start the host. Key on: ARMED.</li><li>Scope: CH1 on the module input, 1 V/div. Trigger on CH1 rising, <strong>Normal</strong>, 200 ms/div, trigger point at the left.</li><li>Type <code>FIRE 500</code> and then, within the pulse, <code>HANG</code>. The pulse ends early: the watchdog reset the chip.</li><li>The host shows <code>OK HANG</code>, then nothing for half a second, then <code>EVT BOOT watchdog</code>. The port may drop and reappear; restart the host if it lost the port.</li><li>Measure on the scope how long the output stayed HIGH after you sent <code>HANG</code>.</li></ol><p><strong>Test:</strong> the output turns off within about 500 ms of the hang, the boot reason is <code>watchdog</code>, and the controller comes back in SAFE.</p><aside class="callout warn"><p><strong>Warning:</strong> The watchdog limits how long a hang can keep the output on to its timeout. If 500 ms of unintended firing is unacceptable for your actuator, shorten <code>WATCHDOG_MS</code> (and keep every loop pass well inside it) or add a hardware pulse limiter. The interlock remains the only way to stop it instantly: the E-stop.</p></aside><h3 id="exercise-52-upload-with-the-watchdog-running">Exercise 5.2: Upload with the watchdog running</h3><ol><li>With <code>USE_WATCHDOG</code> at 1, upload the sketch again from Arduino IDE.</li><li>The upload resets the board into its bootloader; the watchdog does not interfere because the reset restarts everything.</li><li>Repeat Exercise 2.3's scope check during the upload.</li></ol><p><strong>Test:</strong> the upload succeeds and the gate never rises.</p></section>
+<section class="chapter" id="lesson-6-the-status-ring"><h2>Lesson 6: The status ring</h2><p class="goal"><strong>Goal:</strong> show the controller's state on the WS2812 ring, with clean data at 5 V. <strong>Time:</strong> 1.5 hours. <strong>Pass:</strong> the ring shows SAFE, ARMED, FIRING, FAULT and "no host" correctly, with no flicker, with the ring powered from 5 V and the data level-shifted.</p><h3 id="why-a-level-shifter">Why a level shifter</h3><figure><img src="diagrams/08-ring.svg" alt="Ring wiring through the 74AHCT125"><figcaption>WS2812 pixels run at 5 V and expect a HIGH data level of about 0.7 × 5 V = 3.5 V. The XIAO's 3.3 V is below that. It often works on the bench and fails on a long wire or a warm day. The 74AHCT125 is a buffer powered from 5 V whose inputs switch at TTL levels, so it accepts 3.3 V as HIGH and outputs a full 5 V signal.</figcaption></figure><p>The ring is an indicator, not a safety function. A dark ring proves nothing: the state is what the controller reports and what the interlock enforces.</p><h3 id="exercise-61-wire-the-ring">Exercise 6.1: Wire the ring</h3><ol><li>Fit the 74AHCT125 socket. Pin 14 to 5 V, pin 7 to GND, 100 nF from pin 14 to pin 7 close to the socket.</li><li>Channel 1: pin 1 (1OE) to GND to enable it, XIAO D10 into pin 2 (1A), pin 3 (1Y) out through 330 Ω to the ring's DIN, with the resistor at the ring's end of the wire.</li><li>Unused channels: inputs (pins 5, 9, 12) to GND, and their enable pins (4, 10, 13) to 5 V to switch them off. Check this pinout against the datasheet of the part you have.</li><li>Power the ring from 5 V (the REASON buck or a 5 V adapter), not from the XIAO. Put 1000 µF across the ring's 5 V and GND where the power enters. Join this GND to the common GND.</li><li>Insert the chip only after checking with the meter: 5 V between pins 14 and 7, nothing on pin 2.</li></ol><h3 id="exercise-62-switch-the-ring-on">Exercise 6.2: Switch the ring on</h3><ol><li>Set <code>RING_LEDS</code> to your ring's pixel count and <code>USE_RING</code> to 1. Upload.</li><li>Key off: green. Key on with the host running: amber. <code>FIRE 300</code>: red for the pulse. Welded-contact simulation: blinking red. <code>mute</code>: one pixel blue (and the controller drops to SAFE: green with a blue pixel).</li><li>Measure the 5 V supply current with the ring amber. At brightness 60 of 255 it stays far below the ring's full-white maximum (about 60 mA per pixel).</li></ol><h3 id="exercise-63-check-the-data-on-the-scope">Exercise 6.3: Check the data on the scope</h3><ol><li>CH1 on D10 (3.3 V side), CH2 on the ring's DIN (5 V side), 1 V/div and 2 V/div, 500 ns/div, trigger on CH1 rising.</li><li>The bits are pulses of roughly 0.4 µs (a 0) and 0.8 µs (a 1) in a 1.25 µs frame. CH2 swings to 5 V, CH1 to 3.3 V.</li><li>Look at CH2's edges at the ring: little overshoot with the 330 Ω in place.</li></ol><p><strong>Test:</strong> no flicker in any state; CH2 reaches above 4.5 V.</p></section>
+<section class="chapter" id="lesson-7-testing-like-you-mean-it"><h2>Lesson 7: Testing like you mean it</h2><p class="goal"><strong>Goal:</strong> prove, one condition at a time, that the controller does what the safety design says, including when things fail. <strong>Time:</strong> 2.5 hours. <strong>Pass:</strong> every row of the test matrix passes, with scope timings in the record.</p><h3 id="how-to-test-a-safety-function">How to test a safety function</h3><ul><li>Write the expected result <strong>before</strong> you do the test.</li><li>Test one thing at a time, from a known starting state (key off, host running, controller SAFE).</li><li>Test the failure cases as carefully as the normal ones: a controller that fires correctly but also fires when it should not has failed.</li><li>Record what you saw, not what you expected. A row that passes on the second attempt gets a note.</li><li>After any change to the firmware or the wiring, run the whole matrix again.</li></ul><h3 id="the-test-matrix">The test matrix</h3><p>All tests on the bench at 12 V with the current limit at 0.5 A and the dummy load; host running unless the row says otherwise.</p><div class="table-wrap"><table><thead><tr><th>ID</th><th>Starting state</th><th>Action</th><th>Expected</th></tr></thead><tbody><tr><td>T1</td><td>Key off</td><td><code>FIRE 100</code></td><td><code>ERR NOT_ARMED</code>; no pulse</td></tr><tr><td>T2</td><td>Key on, host not running</td><td>Wait 5 s</td><td>Stays SAFE; ring green with a blue pixel</td></tr><tr><td>T3</td><td>ARMED</td><td><code>FIRE 100</code></td><td>One pulse, 100 ms within 2 ms (scope)</td></tr><tr><td>T4</td><td>ARMED</td><td><code>FIRE 0</code>, <code>FIRE 501</code>, <code>FIRE x</code></td><td><code>ERR RANGE</code> each; no pulse</td></tr><tr><td>T5</td><td>ARMED</td><td><code>FIRE 100</code> twice within 1 s</td><td>Second <code>ERR REARM</code></td></tr><tr><td>T6</td><td>ARMED</td><td><code>FIRE 500</code>, E-stop pressed during the pulse</td><td>Rail and output off; SAFE; rail-off time measured</td></tr><tr><td>T7</td><td>ARMED</td><td>Key off</td><td>SAFE within 50 ms of CHAIN falling</td></tr><tr><td>T8</td><td>ARMED</td><td><code>mute</code></td><td>SAFE <code>host_lost</code> within 1.0 s</td></tr><tr><td>T9</td><td>FIRING (<code>FIRE 500</code>)</td><td>Unplug the XIAO's USB</td><td>Output off at once (pull-down); rail stays live while the key is on</td></tr><tr><td>T10</td><td>FIRING (<code>FIRE 500</code>)</td><td><code>HANG</code></td><td>Output off within 0.5 s; <code>EVT BOOT watchdog</code></td></tr><tr><td>T11</td><td>FIRING (<code>FIRE 500</code>)</td><td>Press the XIAO's reset button</td><td>Output off at once; boots SAFE</td></tr><tr><td>T12</td><td>ARMED</td><td>Short the ARM divider output to GND</td><td>FAULT <code>coil_feed_without_rail</code> within 50 ms</td></tr><tr><td>T13</td><td>Key off</td><td>Welded-contact simulation (Exercise 1.3)</td><td>FAULT <code>rail_without_coil_feed</code>; <code>CLEAR</code> refused until the simulation is removed</td></tr><tr><td>T14</td><td>FAULT</td><td><code>CLEAR</code> with the key on</td><td><code>ERR KEY_ON</code></td></tr><tr><td>T15</td><td>ARMED</td><td>Upload the firmware</td><td>No pulse on the gate during the upload (scope, Normal trigger)</td></tr><tr><td>T16</td><td>ARMED</td><td>Send a 100-character line</td><td><code>ERR UNKNOWN</code>; state unchanged</td></tr></tbody></table></div><h3 id="exercise-71-run-the-matrix">Exercise 7.1: Run the matrix</h3><ol><li>Copy the matrix into the test record at the end of the course (Worksheet 1), one row per test.</li><li>Run T1 to T16 in order. Fill in "observed" and "pass" for each.</li><li>For any failure: stop, find the cause, fix it, and run the <strong>whole</strong> matrix again, not just the failed row.</li></ol><h3 id="exercise-72-measure-the-timings">Exercise 7.2: Measure the timings</h3><figure><img src="diagrams/09-timing.svg" alt="What to measure when the E-stop is pressed"></figure><ol><li>CH1 on the coil feed (the CHAIN divider's input side, 5 V/div), CH2 on the fire rail (5 V/div), CH3 on the module input (1 V/div), CH4 on CHAIN at the XIAO pin (1 V/div). Ground clips on the common GND.</li><li>Trigger on CH1, falling edge at 6 V, <strong>Single</strong> (<a href="../sds804x-hd/sds804x-hd-course.html#exercise-31-single-shot-see-the-bounce">single-shot captures</a>). Timebase 5 ms/div, trigger point at the left.</li><li>Arm, <code>FIRE 500</code>, press the E-stop during the pulse.</li><li>Measure with cursors: E-stop to rail off (relay release, slowed by the flyback diode), and E-stop to output off (the firmware's reaction: debounce plus a loop). Write both in the record.</li><li>Repeat for T3: measure the pulse width with the automatic +Width (<a href="../sds804x-hd/sds804x-hd-course.html#exercise-21-automatic-measurements">automatic measurements</a>) and with statistics over 10 pulses.</li><li>For T8, trigger on the output's falling edge and use the host log time stamps to bound the heartbeat timeout; with History (<a href="../sds804x-hd/sds804x-hd-course.html#exercise-35-go-back-in-time">History</a>) you can step back through the last pulses.</li></ol><p><strong>Test:</strong> the rail turns off within about 15 ms of the E-stop (the G5LE's 5 ms release plus the diode's delay; your measurement is the reference value from now on), and the output within about 25 ms.</p><aside class="callout note"><p><strong>Note:</strong> The rail-off time is a property of the relay and its diode, not of the firmware. A slower release (a diode with a series resistor or a Zener would speed it up) is a hardware design choice; the <a href="../sds804x-hd/sds804x-hd-course.html#lesson-7-switching-loads">switching lesson of the oscilloscope course</a> shows how the flyback path shapes the turn-off.</p></aside></section>
+<section class="chapter" id="lesson-8-capstone-the-tower-2-controller"><h2>Lesson 8: Capstone: the tower 2 controller</h2><p class="goal"><strong>Goal:</strong> bring the complete controller up on the bench with the real interlock parts, pass the full test record, and only then connect the real actuator. <strong>Time:</strong> 3 hours. <strong>Pass:</strong> the test record is complete and signed, and the real actuator fires only when armed and commanded, for the commanded time.</p><h3 id="build-order">Build order</h3><ol><li><strong>Interlock first.</strong> Replace the rehearsal switches with the real key and E-stop (REASON W23, W24, W26, W31). Test the interlock alone, with the XIAO disconnected, as in soldering Exercise 6.5: key off, key on, E-stop. Rail voltage with the meter each time.</li><li><strong>Inputs.</strong> Measure both divider outputs in all four combinations (Exercise 1.1). Connect them to D1 and D7.</li><li><strong>Output with the dummy load.</strong> Module input on D2 with its pull-down, the dummy load on the fire rail.</li><li><strong>Ring</strong> on D10 through the 74AHCT125, from the 5 V buck.</li><li><strong>Firmware</strong> with <code>USE_WATCHDOG 1</code>, <code>USE_RING 1</code>, and your final <code>MAX_PULSE_MS</code> and <code>MIN_REARM_MS</code>. Keep <code>TEST_COMMANDS 1</code> for the test run.</li></ol><h3 id="exercise-81-full-test-run-with-the-dummy-load">Exercise 8.1: Full test run with the dummy load</h3><ol><li>Run the complete test matrix (Lesson 7) on the real hardware, scope timings included.</li><li>Fill in Worksheet 1. Every row must pass; any change means running all rows again.</li></ol><h3 id="exercise-82-the-real-actuator">Exercise 8.2: The real actuator</h3><ol><li>Key off, E-stop pressed, supply off.</li><li>Replace the dummy load with the real actuator, with its flyback diode. Make sure it is in a safe position and nobody is near its moving parts.</li><li>Raise the current limit to what the actuator needs, and no further.</li><li>Supply on, E-stop released, host running. Turn the key: ARMED.</li><li><code>FIRE</code> with the shortest pulse that works, then your normal pulse. Check the pulse width on the scope once more with the real load.</li><li>Repeat T6 (E-stop during a pulse), T7 (key off) and T8 (host lost) with the real actuator.</li></ol><h3 id="exercise-83-finish">Exercise 8.3: Finish</h3><ol><li>Set <code>TEST_COMMANDS</code> to 0, upload, and confirm <code>HANG</code> now gives <code>ERR UNKNOWN</code>.</li><li>Re-run T1, T3, T6, T7 and T8 as a short check.</li><li>Sign and date the test record. Keep it with the tower; re-run the short check after any change and at the start of each session where the tower has been moved.</li></ol><p><strong>Test:</strong> the record is complete and signed; you can explain, for each layer, what it guarantees and what it does not.</p></section>
+<section class="chapter" id="troubleshooting"><h2>Troubleshooting</h2><div class="table-wrap"><table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead><tbody><tr><td>No port in Arduino IDE</td><td>Charge-only cable, or the board is in a crashed state</td><td>Data cable; hold B while plugging in and upload from the RPI-RP2 drive</td></tr><tr><td>Upload fails with "port busy"</td><td>The Python host or Serial Monitor holds the port</td><td>Quit the host and close the Serial Monitor</td></tr><tr><td>ARM or CHAIN always LOW</td><td>Missing common ground; divider not connected; wrong pin number</td><td>Join the grounds; measure at the pin; GPIO 27 is D1, GPIO 1 is D7</td></tr><tr><td>ARM or CHAIN flickers</td><td>Floating input (divider disconnected); key switch bouncing heavily</td><td>Measure the divider; keep <code>pinMode(INPUT)</code>; raise <code>DEBOUNCE_MS</code> only after measuring the bounce</td></tr><tr><td>FAULT every time the key turns</td><td>Relay slower than <code>RELAY_MS</code>, or one divider much slower</td><td>Measure the relay timing (Lesson 7) and set <code>RELAY_MS</code> above it with margin</td></tr><tr><td>Never leaves SAFE</td><td>Host not sending PING; interlock not closed for 0.5 s</td><td>Run the host; check <code>STATUS</code> for both inputs</td></tr><tr><td>Drops to SAFE <code>host_lost</code> while the host runs</td><td>Host stalled, USB hub dropping, or the Mac asleep</td><td>Keep the Mac awake; connect directly; watch the host's time stamps</td></tr><tr><td>The load does not switch, or only weakly</td><td>MOSFET module not logic-level; dummy load on the 12 V supply instead of the rail; missing ground</td><td>Measure the module's output voltage when on; use a logic-level module; check the wiring against the drawing</td></tr><tr><td>The load flickers at power-up or upload</td><td>No pull-down on the module input</td><td>Fit 10 kΩ from the input to GND (Lesson 2)</td></tr><tr><td><code>EVT BOOT watchdog</code> without a <code>HANG</code></td><td>A loop pass took longer than <code>WATCHDOG_MS</code> (a blocking call)</td><td>Remove any <code>delay()</code> or blocking read; keep the ring update short</td></tr><tr><td>Ring flickers or shows wrong colours</td><td>No level shifter; resistor missing; ground not common; wrong <code>NEO_GRB</code> order</td><td>Wire as in Lesson 6; try <code>NEO_RGB</code> if red and green are swapped</td></tr><tr><td>Ring dark</td><td>74AHCT125 not powered or OE high; ring on the wrong 5 V</td><td>Measure pins 14 and 1; check the ring's supply</td></tr><tr><td>The rail stays live with the key off</td><td>Welded relay contact</td><td>Switch off at the rocker; replace the relay; the controller should already be in FAULT</td></tr></tbody></table></div></section>
+<section class="chapter" id="reference-cards-and-practice-log"><h2>Reference cards and practice log</h2><div class="card"><div class="cut">✂ cut along the dashed line</div><h3 id="card-a-before-every-session">Card A: Before every session</h3><ul class="tasks"><li class="task"><span class="box"></span>Real actuator disconnected (or in its safe position, capstone only)</li><li class="task"><span class="box"></span>Supply current limit set; dummy load on the fire rail</li><li class="task"><span class="box"></span>Common ground between 12 V, XIAO and ring</li><li class="task"><span class="box"></span>Key off: rail 0 V by meter</li><li class="task"><span class="box"></span>Key on: relay clicks, rail 12 V; E-stop pressed: relay drops, rail 0 V</li><li class="task"><span class="box"></span>Both divider outputs below 3.0 V with the key on</li><li class="task"><span class="box"></span>Host running; <code>STATUS</code> shows the state you expect</li><li class="task"><span class="box"></span>Nobody near the actuator; E-stop within reach</li></ul></div><div class="card"><div class="cut">✂ cut along the dashed line</div><h3 id="card-b-firmware-limits">Card B: Firmware limits</h3><div class="table-wrap"><table><thead><tr><th>Constant</th><th>Course value</th><th>Your value</th><th>Why</th></tr></thead><tbody><tr><td><code>DEBOUNCE_MS</code></td><td>20</td><td></td><td></td></tr><tr><td><code>RELAY_MS</code></td><td>50</td><td></td><td></td></tr><tr><td><code>ARM_SETTLE_MS</code></td><td>500</td><td></td><td></td></tr><tr><td><code>MAX_PULSE_MS</code></td><td>500</td><td></td><td></td></tr><tr><td><code>MIN_REARM_MS</code></td><td>2000</td><td></td><td></td></tr><tr><td><code>HEARTBEAT_MS</code></td><td>1000</td><td></td><td></td></tr><tr><td><code>WATCHDOG_MS</code></td><td>500</td><td></td><td></td></tr></tbody></table></div></div><div class="card"><div class="cut">✂ cut along the dashed line</div><h3 id="card-c-protocol">Card C: Protocol</h3><div class="table-wrap"><table><thead><tr><th>Send</th><th>Reply</th></tr></thead><tbody><tr><td><code>PING</code></td><td><code>OK PONG &lt;state&gt;</code></td></tr><tr><td><code>STATUS</code></td><td><code>OK STATUS state= arm= chain= rail= rearm=</code></td></tr><tr><td><code>FIRE &lt;ms&gt;</code></td><td><code>OK FIRE</code>, <code>ERR NOT_ARMED</code>, <code>ERR RANGE</code>, <code>ERR REARM</code>, <code>ERR NO_RAIL</code></td></tr><tr><td><code>STOP</code></td><td><code>OK STOP</code></td></tr><tr><td><code>CLEAR</code></td><td><code>OK CLEAR</code>, <code>ERR KEY_ON</code>, <code>ERR NO_FAULT</code></td></tr><tr><td>(event)</td><td><code>EVT STATE &lt;state&gt; &lt;reason&gt;</code>, <code>EVT BOOT power-on</code> or <code>watchdog</code></td></tr></tbody></table></div></div><div class="card"><div class="cut">✂ cut along the dashed line</div><h3 id="card-d-pins-and-numbers">Card D: Pins and numbers</h3><ul><li><strong>D1</strong> (GPIO 27) ARM, <strong>D7</strong> (GPIO 1) CHAIN, <strong>D2</strong> (GPIO 28) FIRE, <strong>D3</strong> (GPIO 29) drain sense, <strong>D10</strong> (GPIO 3) ring</li><li><strong>Divider:</strong> 22 kΩ + 10 kΩ over 10 kΩ: pin = input × 10 / 42; 12 V gives 2.86 V; keep the input under 13.8 V</li><li><strong>Relay G5LE-1-E 12 VDC:</strong> about 33 mA coil current, 360 Ω coil; operate 10 ms, release 5 ms at most (slower with the flyback diode)</li><li><strong>74AHCT125:</strong> 14 = 5 V, 7 = GND, 1 = 1OE (to GND), 2 = 1A (in), 3 = 1Y (out)</li><li><strong>WS2812:</strong> 5 V, data HIGH above about 3.5 V; 330 Ω at the ring; 1000 µF across its supply</li><li><strong>Pins:</strong> 3.3 V only, not 5 V tolerant; HIGH above about 2 V</li></ul></div><h3 id="worksheet-1-test-record">Worksheet 1: Test record</h3><div class="table-wrap"><table><thead><tr><th>Test</th><th>Expected</th><th>Observed</th><th>Pass</th><th>Initials</th></tr></thead><tbody><tr><td>T1</td><td><code>ERR NOT_ARMED</code>, no pulse</td><td></td><td></td><td></td></tr><tr><td>T2</td><td>Stays SAFE without host</td><td></td><td></td><td></td></tr><tr><td>T3</td><td>100 ms pulse within 2 ms</td><td></td><td></td><td></td></tr><tr><td>T4</td><td><code>ERR RANGE</code> ×3</td><td></td><td></td><td></td></tr><tr><td>T5</td><td><code>ERR REARM</code></td><td></td><td></td><td></td></tr><tr><td>T6</td><td>E-stop: rail off in … ms, output off in … ms</td><td></td><td></td><td></td></tr><tr><td>T7</td><td>Key off: SAFE</td><td></td><td></td><td></td></tr><tr><td>T8</td><td>Mute: SAFE within 1 s</td><td></td><td></td><td></td></tr><tr><td>T9</td><td>USB unplugged: output off</td><td></td><td></td><td></td></tr><tr><td>T10</td><td>HANG: off within 0.5 s, boot watchdog</td><td></td><td></td><td></td></tr><tr><td>T11</td><td>Reset: output off, boots SAFE</td><td></td><td></td><td></td></tr><tr><td>T12</td><td>ARM shorted: FAULT</td><td></td><td></td><td></td></tr><tr><td>T13</td><td>Welded-contact simulation: FAULT</td><td></td><td></td><td></td></tr><tr><td>T14</td><td><code>ERR KEY_ON</code></td><td></td><td></td><td></td></tr><tr><td>T15</td><td>Upload: no pulse</td><td></td><td></td><td></td></tr><tr><td>T16</td><td>Long line: <code>ERR UNKNOWN</code></td><td></td><td></td><td></td></tr></tbody></table></div><p>Firmware version and limits: ______________________ Date: ____________ Signed: ____________________</p><h3 id="practice-log">Practice log</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Lesson / exercise</th><th>What I tested</th><th>Measured values</th><th>Passed?</th><th>Problem and fix</th></tr></thead><tbody><tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div></section>
+<section class="chapter" id="sources"><h2>Sources</h2><ul><li>Seeed Studio, <a href="https://wiki.seeedstudio.com/XIAO-RP2040/">XIAO RP2040 wiki</a>, and the pin maps in the <a href="https://tinygo.org/docs/reference/microcontrollers/boards/xiao-rp2040/">TinyGo board reference</a> and the <a href="https://nuttx.apache.org/docs/latest/platforms/arm/rp2040/boards/seeed-xiao-rp2040/index.html">NuttX board page</a>: D0 to D10 GPIO mapping, onboard pixel on GPIO 12 with power on GPIO 11, RGB LED on GPIO 17, 16 and 25.</li><li>Earle F. Philhower, III, <a href="https://github.com/earlephilhower/arduino-pico">arduino-pico</a> and its documentation: board package URL, supported boards, <code>rp2040.wdt_begin()</code> and <code>rp2040.wdt_reset()</code> (once started, the watchdog cannot be stopped). Check the <a href="https://arduino-pico.readthedocs.io/en/latest/rp2040.html">RP2040 helper documentation</a> for the version you install.</li><li>Raspberry Pi, <a href="https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf">RP2040 datasheet</a>: GPIO electrical characteristics, pad reset state and the watchdog. The course relies on an external pull-down rather than the reset-state pull-down; check the datasheet for the exact values.</li><li>Omron, G5LE relay datasheet: coil current about 33.3 mA and coil resistance 360 Ω for the 12 VDC 400 mW type, operate time 10 ms and release time 5 ms maximum (values confirmed from distributor listings such as <a href="https://www.arrow.com/en/products/g5le-1-edc12/omron">Arrow</a>; check Omron's current datasheet).</li><li>Texas Instruments, <a href="https://www.ti.com/product/SN74AHCT125">SN74AHCT125 datasheet</a>: quad buffer, 4.5 to 5.5 V supply, TTL-compatible inputs, active-low output enables. Check the pin configuration figure against your part.</li><li>Adafruit, <a href="https://learn.adafruit.com/adafruit-neopixel-uberguide/best-practices">NeoPixel Überguide: best practices</a> and <a href="https://learn.adafruit.com/neopixel-levelshifter">level shifting 3.3 V microcontrollers and NeoPixels</a>: 300 to 500 Ω data resistor at the first pixel, 1000 µF across the supply, 74AHCT125 level shifting.</li><li>pySerial, <a href="https://pyserial.readthedocs.io/">documentation</a>: <code>serial.Serial</code>, <code>readline()</code>, port names on macOS.</li></ul></section>
+
+</main></body></html>

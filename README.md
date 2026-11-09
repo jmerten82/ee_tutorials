@@ -11,6 +11,9 @@ My tutorials towards electrical engineering: print-first, hands-on courses with 
 | [Teensy 4.1 Hands-On](teensy41/README.md) | Teensy 4.1 with Teensyduino: 3.3 V rules, timing, analog and PWM, USB MIDI and keyboard, SD logging, MQS audio synth, serial/I2C/CAN/USB host, and a desk synth capstone | about 20 h | [teensy41-course.html](teensy41/teensy41-course.html) | [teensy41-course.pdf](teensy41/teensy41-course.pdf) |
 | [Oscilloscope Guide](oscilloscope/README.md) | Which scope to buy (Siglent SDS804X HD, Rigol DHO804 and alternatives), probing safety, and what a scope shows in every exercise of the courses above | reading | [oscilloscope-guide.html](oscilloscope/oscilloscope-guide.html) | [oscilloscope-guide.pdf](oscilloscope/oscilloscope-guide.pdf) |
 | [Oscilloscope Hands-On](sds804x-hd/README.md) | General oscilloscope skills, tailored to the Siglent SDS804X HD: probes, triggering, measurements and sampling, smart triggers and History, ripple and FFT, edges and ground leads, current shunts, MOSFET switching, UART/I2C/CAN decoding, and a measurement-report capstone | about 20 h | [sds804x-hd-course.html](sds804x-hd/sds804x-hd-course.html) | [sds804x-hd-course.pdf](sds804x-hd/sds804x-hd-course.pdf) |
+| [DYNAMIXEL Hands-On](dynamixel/README.md) | ROBOTIS X-series smart servos from the Mac: the TTL bus and its power, DYNAMIXEL Wizard 2.0, Protocol 2.0 by hand, the control table, Python with the DYNAMIXEL SDK, sync read/write, faults and limits, and a calibrated multi-servo tower rig | about 19 h | [dynamixel-course.html](dynamixel/dynamixel-course.html) | [dynamixel-course.pdf](dynamixel/dynamixel-course.pdf) |
+| [Safe Actuator Control](xiao-interlock/README.md) | A key-and-E-stop interlock and a fail-safe fire controller on the XIAO RP2040: safety design, reading the interlock, fail-safe outputs, a state machine, a heartbeat protocol with the Mac, the watchdog, a status ring, fault-injection testing and a signed test record | about 19 h | [xiao-interlock-course.html](xiao-interlock/xiao-interlock-course.html) | [xiao-interlock-course.pdf](xiao-interlock/xiao-interlock-course.pdf) |
+| [Power and USB for Multi-Board Builds](power-usb/README.md) | One 12 V supply for several boards: power budgets, harness and fuse, buck regulators, grounding, USB hubs, backfeed and CC resistors, noise and brownouts, staged bring-up and a measured power report | about 18 h | [power-usb-course.html](power-usb/power-usb-course.html) | [power-usb-course.pdf](power-usb/power-usb-course.pdf) |
 
 ## Where to start
 
@@ -21,6 +24,7 @@ The courses build on each other, but only loosely:
 3. **[Oscilloscope Guide](oscilloscope/README.md)** once the multimeter stops being enough: what to buy and what each exercise looks like on a scope.
 4. **[Oscilloscope Hands-On](sds804x-hd/README.md)** after at least ESP32 Lessons 0 to 4. It measures the circuits you already built, and uses the ESP32 as its signal generator.
 5. **Soldering Lessons 3 to 6** at any point: rework, surface mount, a kit build, and the REASON practice track.
+6. **The REASON courses** once the joints of soldering Lesson 6 pass: [Power and USB for Multi-Board Builds](power-usb/README.md) to power a tower safely, [DYNAMIXEL Hands-On](dynamixel/README.md) for the servos, and [Safe Actuator Control](xiao-interlock/README.md) for the interlock and fire controller. They can be done in parallel; each starts with a bench setup of its own.
 
 Every course has a **Related courses** section near its start. The ESP32, Teensy and soldering courses also carry **With a scope** tips at the exercises the oscilloscope course measures.
 
@@ -44,6 +48,24 @@ The same topics come up in several courses. Numbers are exercises; follow them a
 | 555 timer | [2.3](soldering/README.md#exercise-23-build-a-555-led-blinker) | – | – | [3.7](sds804x-hd/README.md#exercise-37-optional-the-555-blinker) |
 | Capstone projects | [Lesson 5](soldering/README.md#lesson-5-capstone-kit-build) | [Lesson 7](esp32/README.md#lesson-7-capstone-a-room-climate-monitor) | [Lesson 7](teensy41/README.md#lesson-7-capstone-the-teensy-desk-synth) | [Lesson 9](sds804x-hd/README.md#lesson-9-capstone-characterise-a-project) |
 
+## The REASON build
+
+Soldering Lesson 6 rehearses every joint of the REASON towers. Three courses take each part of a tower from joints to a tested system, and the oscilloscope course provides the measurements.
+
+| Part of a tower | Joints rehearsed | Built, measured and tested |
+| --- | --- | --- |
+| 12 V input: jack, rocker, fuse, harness (W7, W8, W9, W21, W24) | [Soldering 6.3](soldering/README.md#exercise-63-the-12-v-harness-w7-w21) | [Power and USB, Lesson 2](power-usb/README.md#lesson-2-the-12-v-supply-harness-and-fuse) |
+| 5 V bucks onto the hubs' pads (W10, W22) | [Soldering 6.2](soldering/README.md#exercise-62-wires-onto-small-pads-and-an-inline-resistor) | [Power and USB, Lesson 3](power-usb/README.md#lesson-3-buck-regulators) |
+| USB leads to the hubs and the Mac (W2 to W5, W17, W19, W30) | [Soldering 6.1](soldering/README.md#exercise-61-usb-cable-surgery-do-3) | [Power and USB, Lesson 5](power-usb/README.md#lesson-5-usb-power-and-data) |
+| DYNAMIXEL servos and their bus (W13, W14, W29) | crimped, not soldered | [DYNAMIXEL Hands-On](dynamixel/README.md), [Lesson 2](dynamixel/README.md#lesson-2-power-and-the-bus) for power |
+| Interlock board: key, E-stop, relay, dividers (W23, W24, W26, W31) | [Soldering 6.5](soldering/README.md#exercise-65-the-interlock-board-rehearsal-for-w23-w24-w26-w31) | [Safe Actuator Control, Lessons 1 to 3](xiao-interlock/README.md#lesson-1-reading-the-interlock) |
+| Fire controller firmware and the Mac link | | [Safe Actuator Control, Lessons 4 to 5](xiao-interlock/README.md#lesson-4-talking-to-the-mac) |
+| Status ring and level shifter (W28) | [Soldering 6.6](soldering/README.md#exercise-66-fine-wire-and-strain-relief) | [Safe Actuator Control, Lesson 6](xiao-interlock/README.md#lesson-6-the-status-ring) |
+| First power-up of a tower | [Soldering checklist](soldering/README.md#before-you-touch-the-real-towers) | [Power and USB, Lesson 7](power-usb/README.md#lesson-7-bring-up-powering-a-new-tower-safely) |
+| Proof that it is safe | | [Safe Actuator Control, Lesson 7](xiao-interlock/README.md#lesson-7-testing-like-you-mean-it) and [Lesson 8](xiao-interlock/README.md#lesson-8-capstone-the-tower-2-controller) |
+
+The REASON details in these courses come from soldering Lesson 6 and REASON's own build page. Where a course had to assume something (a servo model, a pin), it says so: check it against the build page.
+
 ## Shared kit
 
 Most hardware is bought once and reused:
@@ -54,6 +76,8 @@ Most hardware is bought once and reused:
 - **12 V adapter, IRLB8721 MOSFET, 1N5819 diode and a small motor or LED strip** from ESP32 Lesson 3 (Teensy Lesson 2 uses the same parts): measured again in oscilloscope Lesson 7.
 - **BME280 sensor and SSD1306 OLED** from ESP32 Lesson 4, also used by the Teensy course.
 - **SN65HVD230 CAN transceivers** from Teensy Exercise 6.3: decoded in oscilloscope Exercise 8.4.
+- **USB current-sense lead** from oscilloscope Exercise 6.1: reused for servo and tower currents in the DYNAMIXEL and Power and USB courses.
+- **A current-limited bench supply** for every first power-up in the REASON courses.
 
 Each course's "Everything you need for all lessons" chapter has the full list.
 

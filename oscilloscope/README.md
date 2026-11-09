@@ -21,6 +21,7 @@ Most buying information comes from hobbyist review sites and forums, not manufac
 
 - [Oscilloscope Hands-On](../sds804x-hd/README.md) is the full course that grew out of this guide, written for the Siglent SDS804X HD.
 - The measurement tables below point into [Hands-On Soldering](../soldering/README.md), [ESP32 Hands-On](../esp32/README.md) and [Teensy 4.1 Hands-On](../teensy41/README.md); those courses link back with **With a scope** tips.
+- The REASON courses ([DYNAMIXEL Hands-On](../dynamixel/README.md), [Safe Actuator Control](../xiao-interlock/README.md) and [Power and USB for Multi-Board Builds](../power-usb/README.md)) put the scope to work on servos, an interlock and a 12 V power tree.
 
 ## Which scope to buy
 

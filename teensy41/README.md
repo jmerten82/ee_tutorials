@@ -43,6 +43,7 @@ Work in sessions of 60–90 minutes and stop with something working. When a sket
 - [ESP32 Hands-On](../esp32/README.md) covers the same basics with Wi-Fi, deep sleep and battery life instead of USB devices and audio. Do the two courses in either order.
 - [Oscilloscope Hands-On](../sds804x-hd/README.md) uses the Teensy for its fastest signals: pin edges in [Lesson 5](../sds804x-hd/README.md#lesson-5-edges-and-probing), MQS audio in [Exercise 4.6](../sds804x-hd/README.md#exercise-46-optional-teensy-mqs-audio) and the CAN bus in [Exercise 8.4](../sds804x-hd/README.md#exercise-84-can). Look for **With a scope** tips in the lessons below.
 - The [oscilloscope buying guide](../oscilloscope/README.md) lists what a scope shows in each exercise of this course.
+- For REASON's towers: [DYNAMIXEL Hands-On](../dynamixel/README.md), [Safe Actuator Control](../xiao-interlock/README.md) and [Power and USB for Multi-Board Builds](../power-usb/README.md).
 
 ## Three rules that save boards
 

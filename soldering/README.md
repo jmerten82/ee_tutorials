@@ -31,6 +31,7 @@ Work in sessions of 60–90 minutes. Fine motor control degrades with fatigue fa
 - [ESP32 Hands-On](../esp32/README.md) and [Teensy 4.1 Hands-On](../teensy41/README.md) start where Lesson 2 ends. Both expect you to solder headers onto a module ([Exercise 6.4](#exercise-64-straight-headers-on-modules)) and to move a finished breadboard circuit onto perfboard.
 - [Oscilloscope Hands-On](../sds804x-hd/README.md) measures the [555 blinker](#exercise-23-build-a-555-led-blinker) from Lesson 2, and its current-sense lead uses the cable skills of [Exercise 6.1](#exercise-61-usb-cable-surgery-do-3).
 - The [oscilloscope buying guide](../oscilloscope/README.md) explains what a scope adds at the soldering bench: finding intermittent joints and checking a first power-up.
+- The REASON courses take these joints further: [Power and USB for Multi-Board Builds](../power-usb/README.md) powers and measures the harness and USB leads, [Safe Actuator Control](../xiao-interlock/README.md) turns the interlock board of Exercise 6.5 into the tower 2 controller, and [DYNAMIXEL Hands-On](../dynamixel/README.md) brings up the servos.
 
 ## The engineering of a solder joint
 
@@ -587,6 +588,8 @@ The braid and the drain are the cable's shield; folding them back cleanly and la
 
 > **Tip:** The same skills build the USB current-sense lead in [Exercise 6.1](../sds804x-hd/README.md#exercise-61-build-a-usb-current-sense-lead) of the oscilloscope course: a 1 Ω resistor spliced into the 5 V wire, for measuring a board's current on a scope.
 
+> **Tip:** After the cable work: [Lesson 5 of Power and USB](../power-usb/README.md#lesson-5-usb-power-and-data) checks a finished lead for backfeed, the CC resistor and a 480 Mb/s link on macOS.
+
 ### Exercise 6.2: Wires onto small pads, and an inline resistor
 
 1. On a scrap board (the SMD practice board or a dead PCB), tin five pads and five 22 AWG wire ends.
@@ -603,6 +606,8 @@ The braid and the drain are the cable's shield; folding them back cleanly and la
 4. Splice the fuse holder's leads into the red wire (Exercise 1.2).
 5. Shrink every tube over its lug; nothing bare may remain on the 12 V side.
 6. **Test:** meter on continuity: jack centre pin to the red end beeps, sleeve to the black end beeps, red to black is silent. Then fit the 7.5 A fuse, plug in the supply and read +12 V on red with the rocker on, 0 V with it off. REASON writes "polarity: meter first" on W7 and W21 for a reason.
+
+> **Tip:** Sizing the wire and the fuse, and measuring the harness under load, is [Lesson 2 of Power and USB](../power-usb/README.md#lesson-2-the-12-v-supply-harness-and-fuse).
 
 ### Exercise 6.4: Straight headers on modules
 
@@ -637,6 +642,8 @@ The key and E-stop carry only the coil's ≈ 35 mA; the relay's contact carries 
 
 **The level shifter (W28)** goes on the same board in a DIP-14 socket: pin 14 to 5 V, pin 7 to GND, pin 1 (1OE) to GND to enable channel 1, XIAO D10 into pin 2 (1A), pin 3 (1Y) out to the ring's data in, and the unused inputs (pins 5, 9 and 12) to GND. Check TI's datasheet pinout against your part before soldering the socket.
 
+> **Tip:** The firmware side of this board, from reading ARM and CHAIN to a tested fire controller, is [Safe Actuator Control](../xiao-interlock/README.md), starting at [Lesson 1](../xiao-interlock/README.md#lesson-1-reading-the-interlock).
+
 ### Exercise 6.6: Fine wire and strain relief
 
 1. Solder three 26 AWG wires (5 V, GND, data) to a spare WS2812 ring's or strip's pads: tin pads, tin wires, tack, 1 s each.
@@ -654,6 +661,8 @@ The key and E-stop carry only the coil's ≈ 35 mA; the relay's contact carries 
 - [ ] 6.5 Interlock passes all four bench tests at 12 V with a current limit
 - [ ] 6.6 Ring lights; joints survive the wiggle test
 - [ ] Then REASON's bench steps B1–B3 with the real parts
+
+> **Tip:** Then power the first tower up in stages with [Lesson 7 of Power and USB](../power-usb/README.md#lesson-7-bring-up-powering-a-new-tower-safely), bring the servos up with [DYNAMIXEL Hands-On](../dynamixel/README.md), and test the controller with [the test matrix of Safe Actuator Control](../xiao-interlock/README.md#lesson-7-testing-like-you-mean-it).
 
 ## Inspection and troubleshooting
 
